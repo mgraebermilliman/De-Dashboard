@@ -1,0 +1,15 @@
+# Secrets
+.env
+
+# Extracted data contains real employee information and must never be committed
+data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Power BI Project local/cache files
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+*.pbix
