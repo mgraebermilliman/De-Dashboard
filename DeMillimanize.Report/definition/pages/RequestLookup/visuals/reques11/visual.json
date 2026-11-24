@@ -1,0 +1,237 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "reques11",
+  "position": {
+    "x": 24,
+    "y": 378,
+    "z": 11,
+    "height": 262,
+    "width": 600,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "multiRowCard",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Requests Made"
+                }
+              },
+              "queryRef": "People.Requests Made",
+              "nativeQueryRef": "Requests Made",
+              "displayName": "Requests made"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Requests Made For Others"
+                }
+              },
+              "queryRef": "People.Requests Made For Others",
+              "nativeQueryRef": "Requests Made For Others",
+              "displayName": "For others"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Times Named As Recipient"
+                }
+              },
+              "queryRef": "People.Times Named As Recipient",
+              "nativeQueryRef": "Times Named As Recipient",
+              "displayName": "As recipient"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Approved"
+                }
+              },
+              "queryRef": "People.Approved",
+              "nativeQueryRef": "Approved",
+              "displayName": "Approved"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Denied"
+                }
+              },
+              "queryRef": "People.Denied",
+              "nativeQueryRef": "Denied",
+              "displayName": "Denied"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Pending"
+                }
+              },
+              "queryRef": "People.Pending",
+              "nativeQueryRef": "Pending",
+              "displayName": "Pending"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Needs Review"
+                }
+              },
+              "queryRef": "People.Needs Review",
+              "nativeQueryRef": "Needs Review",
+              "displayName": "Needs review"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "First Request"
+                }
+              },
+              "queryRef": "People.First Request",
+              "nativeQueryRef": "First Request",
+              "displayName": "First request"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Last Request"
+                }
+              },
+              "queryRef": "People.Last Request",
+              "nativeQueryRef": "Last Request",
+              "displayName": "Last request"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Shortest Gap (Days)"
+                }
+              },
+              "queryRef": "People.Shortest Gap (Days)",
+              "nativeQueryRef": "Shortest Gap (Days)",
+              "displayName": "Shortest gap (days)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "14D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryLabels": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Request counts'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Request counts for the selected person'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

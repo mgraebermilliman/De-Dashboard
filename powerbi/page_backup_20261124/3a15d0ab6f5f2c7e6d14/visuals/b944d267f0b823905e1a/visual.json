@@ -1,0 +1,136 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "b944d267f0b823905e1a",
+  "position": {
+    "x": 308.33333333333337,
+    "y": 588.33333333333337,
+    "z": 3,
+    "height": 450,
+    "width": 1151.6666666666667,
+    "tabOrder": 3
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Created Date"
+                }
+              },
+              "queryRef": "Requests.Created Date",
+              "nativeQueryRef": "Created Date"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Ticket ID"
+                }
+              },
+              "queryRef": "Requests.Ticket ID",
+              "nativeQueryRef": "Ticket ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Requester Name"
+                }
+              },
+              "queryRef": "Requests.Requester Name",
+              "nativeQueryRef": "Requester Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Computer Provided To"
+                }
+              },
+              "queryRef": "Requests.Computer Provided To",
+              "nativeQueryRef": "Computer Provided To"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Device Type"
+                }
+              },
+              "queryRef": "Requests.Device Type",
+              "nativeQueryRef": "Device Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Outcome"
+                }
+              },
+              "queryRef": "Requests.Outcome",
+              "nativeQueryRef": "Outcome"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Outcome Evidence"
+                }
+              },
+              "queryRef": "Requests.Outcome Evidence",
+              "nativeQueryRef": "Outcome Evidence"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Certificate Attached"
+                }
+              },
+              "queryRef": "Requests.Certificate Attached",
+              "nativeQueryRef": "Certificate Attached"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

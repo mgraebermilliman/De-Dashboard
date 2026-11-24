@@ -1,0 +1,222 @@
+table _Measures
+	lineageTag: 10a35b6e-fdb2-4936-ac13-3dec636bdb22
+
+	measure 'Total Requests' = COALESCE ( COUNTROWS ( Requests ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 66d0fb97-d952-4cd6-8a48-f5623c206cce
+
+	measure Approved = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Approved" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: ac956920-a1c1-41a1-92f3-f6506f17d828
+
+	measure Denied = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Denied" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 7a38a0e4-5b65-4ad1-b6f7-81e2e2495b2e
+
+	measure Pending = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Pending" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 08326b61-7f56-41e2-a461-ccd241033625
+
+	measure 'Needs Review' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Needs Review" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 8b6b3be5-f637-4620-9dd8-68b708b163a6
+
+	measure 'Unique Requesters' = COALESCE ( DISTINCTCOUNTNOBLANK ( Requests[Requester Name] ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 4a2d2e10-cd31-4ae5-912b-84e0689e87f8
+
+	measure 'Frequent Requests' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Frequent (Requester)] = "Yes" || Requests[Frequent (Recipient)] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 283cf641-ee5d-46c9-8299-cec09ab9c0ee
+
+	measure 'Frequent People' = COALESCE ( CALCULATE ( DISTINCTCOUNT ( PersonRequests[Person] ), People[Frequent] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 49485217-8024-477d-8c02-8a0c87cdf4d0
+
+	measure 'Requests Made For Others' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Recipient Differs From Requester] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 360bd87b-e8f8-4505-8c51-1f86ec52f9b7
+
+	measure 'Duplicate Serials' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Same Serial Seen Before] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 9b1b37eb-4e6e-44ff-8de3-47917e6ada74
+
+	measure 'Certificates Missing' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Certificate Missing] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 202d66c1-2c09-4910-b96b-01eea2f6914f
+
+	measure 'Match Needs Review' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Match Needs Review] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: 55a905d2-39b9-43c5-9c78-f57327b6a455
+
+	measure 'Technician-Listed Requests' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Recipient Is Technician] = "Yes" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+		lineageTag: ed89473a-6754-473c-ae53-fa8894377962
+
+	measure 'Approval Rate %' = DIVIDE ( [Approved], [Approved] + [Denied] )
+		formatString: 0.0%
+		displayFolder: Rates
+		lineageTag: 9d4dd1a1-2517-4fd3-826c-c31152a51cf5
+
+	measure 'Denial Rate %' = DIVIDE ( [Denied], [Approved] + [Denied] )
+		formatString: 0.0%
+		displayFolder: Rates
+		lineageTag: 943b43ac-1f7c-40f7-a656-62c3aa18b8c5
+
+	measure 'Holiday Season Share %' = DIVIDE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Holiday Season] = "Yes" ), [Total Requests] )
+		formatString: 0.0%
+		displayFolder: Rates
+		lineageTag: d6d64bb9-5b4a-43ae-9a10-ac23ff48328a
+
+	measure 'Avg Days Between Requests' = AVERAGE ( Requests[Days Since Previous (Requester)] )
+		formatString: 0
+		displayFolder: Timing
+		lineageTag: b5b09ce6-fa2f-44a9-8225-6e8c780f35dd
+
+	measure 'Avg Days Between Requests (Recipient)' = AVERAGE ( Requests[Days Since Previous (Recipient)] )
+		formatString: 0
+		displayFolder: Timing
+		lineageTag: 911ed9b2-002c-4174-9a6c-2d66ea5aa71d
+
+	measure 'Avg Days to Decision' = AVERAGEX ( FILTER ( Requests, NOT ISBLANK ( Requests[Decision Date] ) && NOT ISBLANK ( Requests[Created Date] ) ), DATEDIFF ( Requests[Created Date], Requests[Decision Date], DAY ) )
+		formatString: 0.0
+		displayFolder: Timing
+		lineageTag: ed2b82f6-2c40-4ada-b92e-2a7311052309
+
+	measure 'Requests Same Period Last Year' = CALCULATE ( [Total Requests], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+		formatString: #,0
+		displayFolder: Timing
+		lineageTag: 21de667b-5710-40b9-9d9e-0393c31aacb1
+
+	measure 'Requests MoM Change' = VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) ) RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), [Total Requests] - Previous )
+		formatString: +#,0;-#,0;0
+		displayFolder: Timing
+		lineageTag: bc4a8b70-7394-4a9c-a0c8-99764f524edb
+
+	measure 'Requests MoM Change %' = VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) ) RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), DIVIDE ( [Total Requests] - Previous, Previous ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Timing
+		lineageTag: e476f20a-e5fe-4dbb-b7f0-9e5c735de3eb
+
+	measure 'Requests YoY Change' = [Total Requests] - [Requests Same Period Last Year]
+		formatString: +#,0;-#,0;0
+		displayFolder: Timing
+		lineageTag: 4b98bb75-3b69-4fca-82cb-37d9d9476ceb
+
+	measure 'Requests YoY Change %' = DIVIDE ( [Total Requests] - [Requests Same Period Last Year], [Requests Same Period Last Year] )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Timing
+		lineageTag: 8a821bf6-b2c0-4b24-b153-9974cfb9e15d
+
+	measure 'Share of Year %' = DIVIDE ( [Total Requests], CALCULATE ( [Total Requests], ALLEXCEPT ( DimDate, DimDate[Year] ) ) )
+		formatString: 0.0%
+		displayFolder: Patterns
+		lineageTag: 09f8a8b2-645c-4e85-ac6e-fe3d9478cd49
+
+	measure 'All-Years Share of Month %' = DIVIDE ( CALCULATE ( [Total Requests], REMOVEFILTERS ( DimDate[Year] ) ), CALCULATE ( [Total Requests], REMOVEFILTERS ( DimDate[Year], DimDate[Month], DimDate[Month Number] ) ) )
+		formatString: 0.0%
+		displayFolder: Patterns
+		lineageTag: 75f2858a-8865-4d9f-904a-7e0d9b0a7280
+
+	measure 'Requests in Gap Bucket' = VAR Low = SELECTEDVALUE ( GapBuckets[Min Days] ) VAR High = SELECTEDVALUE ( GapBuckets[Max Days] ) RETURN COALESCE ( SUMX ( Requests, VAR Gap = COALESCE ( Requests[Days Since Previous (Recipient)], Requests[Days Since Previous (Requester)] ) RETURN IF ( NOT ISBLANK ( Gap ) && Gap >= Low && Gap <= High, 1 ) ), 0 )
+		formatString: #,0
+		displayFolder: Patterns
+		lineageTag: 261f9095-6744-4058-bb89-5796e8f2ba78
+
+	measure 'Holiday Band' = IF ( SELECTEDVALUE ( DimDate[Holiday Month] ) = "Yes", MAXX ( ALLSELECTED ( DimDate[Month Start] ), [Total Requests] ) )
+		formatString: #,0
+		displayFolder: Patterns
+		lineageTag: 9f78405e-b890-4b87-a0dd-dbc48544dbe9
+
+	measure 'Selected Person' = SELECTEDVALUE ( People[Person] )
+		displayFolder: Lookup
+		lineageTag: d8f73ec9-9eae-42e1-a610-2e3a243bc0ff
+
+	measure 'Lookup Prompt' = IF ( ISBLANK ( [Selected Person] ), "Type a name to see their request history", "" )
+		displayFolder: Lookup
+		lineageTag: 8e2dabb0-df20-464b-ab39-1ea07f7ebe58
+
+	measure 'Frequent Banner' = IF ( SELECTEDVALUE ( People[Frequent] ) = "Yes", "FREQUENT REQUESTER", "" )
+		displayFolder: Lookup
+		lineageTag: 70f241b6-1d2c-496b-b788-0257d82b5971
+
+	measure 'No History Message' = IF ( NOT ISBLANK ( [Selected Person] ) && [Total Requests] = 0, "No prior requests found.", "" )
+		displayFolder: Lookup
+		lineageTag: 615e8d41-d78e-4d67-979d-d5ad09a6a740
+
+	measure 'Days Since Previous (Role)' = SWITCH ( SELECTEDVALUE ( PersonRequests[Role] ), "Recipient", MAX ( Requests[Days Since Previous (Recipient)] ), "Requester", MAX ( Requests[Days Since Previous (Requester)] ), MIN ( MAX ( Requests[Days Since Previous (Recipient)] ), MAX ( Requests[Days Since Previous (Requester)] ) ) )
+		formatString: 0
+		displayFolder: Lookup
+		lineageTag: d36571cb-3382-4346-a85f-1a13c40712d2
+
+	measure 'Timeline Y' = IF ( [Total Requests] > 0, 1 )
+		formatString: 0
+		displayFolder: Lookup
+		lineageTag: fd51ebd1-879a-4da7-9e15-041be18a313d
+
+	measure 'Outcome Color' = SWITCH ( SELECTEDVALUE ( Requests[Outcome] ), "Approved", "#2EB67D", "Denied", "#E5484D", "Pending", "#F5A623", "Needs Review", "#7B61FF", "#8A96A3" )
+		displayFolder: Formatting
+		lineageTag: 5970f7de-2f71-47ae-a01c-7bad396e3803
+
+	measure 'Certificate Flag' = IF ( SELECTEDVALUE ( Requests[Certificate Attached] ) = "Yes", 1, 0 )
+		formatString: 0
+		displayFolder: Formatting
+		lineageTag: 69ad842a-91b1-49ec-ab0f-1efc521a60c1
+
+	measure 'Mock Data Banner' = IF ( COALESCE ( CALCULATE ( COUNTROWS ( Requests ), CONTAINSSTRING ( Requests[Ticket URL], "example.invalid" ), REMOVEFILTERS () ), 0 ) > 0, "MOCK DATA - not real tickets", "" )
+		displayFolder: Formatting
+		lineageTag: a6996030-fcf5-424d-be51-60b263518d1a
+
+	measure 'Last Refreshed' = VAR LastOk = CALCULATE ( MAX ( RunLog[Finished (Local)] ), RunLog[Status] = "Success" ) RETURN IF ( ISBLANK ( LastOk ), "Last refreshed: no successful run yet", "Last refreshed: " & FORMAT ( LastOk, "mmm d, yyyy h:mm AM/PM" ) )
+		displayFolder: Refresh
+		lineageTag: 4d285942-0d17-443d-b203-e3c2a294809a
+
+	measure 'Latest Run Status' = VAR LastRun = MAX ( RunLog[Run] ) RETURN CALCULATE ( SELECTEDVALUE ( RunLog[Status] ), RunLog[Run] = LastRun )
+		displayFolder: Refresh
+		lineageTag: ea9e807d-2e74-4bd5-a65a-571c90f113ed
+
+	measure 'Hours Since Last Success' = VAR LastOk = CALCULATE ( MAX ( RunLog[Finished (UTC)] ), RunLog[Status] = "Success" ) RETURN IF ( NOT ISBLANK ( LastOk ), ( UTCNOW () - LastOk ) * 24 )
+		formatString: 0.0
+		displayFolder: Refresh
+		lineageTag: 7ce54293-fd56-45cd-89ea-e619051ce054
+
+	measure 'Refresh Health' = IF ( [Latest Run Status] <> "Success" || ISBLANK ( [Hours Since Last Success] ) || [Hours Since Last Success] > 36, "Attention: check the refresh log", "Healthy" )
+		displayFolder: Refresh
+		lineageTag: 585cea0f-b361-4525-ba54-c104c089a77e
+
+	measure 'Refresh Health Color' = IF ( [Refresh Health] = "Healthy", "#2EB67D", "#E5484D" )
+		displayFolder: Refresh
+		lineageTag: b0e8b40e-9983-4d78-8873-0d723e6557d1
+
+	measure 'Frequent Color' = IF ( SELECTEDVALUE ( People[Frequent] ) = "Yes", "#E5484D", "#12344D" )
+		displayFolder: Formatting
+
+	measure 'Gap Bucket Color' = IF ( SELECTEDVALUE ( GapBuckets[Within 120 Days] ) = "Yes", "#E5484D", "#8A96A3" )
+		displayFolder: Formatting
+
+	column Placeholder
+		dataType: string
+		isHidden
+		lineageTag: ba5651b3-1360-4a6e-adc8-b0da2f82c998
+		summarizeBy: none
+		sourceColumn: Placeholder
+
+	partition _Measures = m
+		mode: import
+		source = #table(type table [Placeholder = text], {})
+
+	annotation PBI_ResultType = Table
+

@@ -1,6 +1,7 @@
+import ssl
 import unittest
 
-from extract.freshservice import FreshserviceClient, FreshserviceError, parse_next_link
+from extract.freshservice import FreshserviceClient, FreshserviceError, parse_next_link, tls_context
 
 
 class LinkHeaderTests(unittest.TestCase):
@@ -26,6 +27,12 @@ class ClientSafetyTests(unittest.TestCase):
     def test_has_no_write_methods(self):
         for name in ("post", "put", "patch", "delete"):
             self.assertFalse(hasattr(FreshserviceClient, name))
+
+    def test_tls_still_verifies_certificates_and_hostname(self):
+        context = tls_context()
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)
+        self.assertFalse(context.verify_flags & ssl.VERIFY_X509_STRICT)
 
 
 if __name__ == "__main__":

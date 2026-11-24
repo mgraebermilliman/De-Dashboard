@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "DeMillimanize"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "433740a4-3fae-4bff-8879-a0ae6d3bacc3"
+  }
+}

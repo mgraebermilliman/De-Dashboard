@@ -10,8 +10,10 @@ import json
 import sys
 
 from . import config
-from .classify import mentions_denial
+from .classify import denial_snippet, is_certificate
+from .fetch import Fetcher
 from .freshservice import FreshserviceClient, FreshserviceError
+from .practices import ad_practices
 
 RATE_HEADERS = ("X-Ratelimit-Total", "X-Ratelimit-Remaining", "X-Ratelimit-Used-Currentrequest")
 
@@ -48,6 +50,7 @@ def main() -> int:
         rate = {h: client.last_headers.get(h) for h in RATE_HEADERS if h in client.last_headers}
         return {
             "key_belongs_to_an_agent": bool(me.get("id")),
+            "list_includes_description_text": bool(tickets) and "description_text" in tickets[0],
             "ticket_shape": describe(tickets[0]) if tickets else None,
             "rate_limit_headers": rate,
         }
@@ -80,21 +83,52 @@ def main() -> int:
                 "(ideally one form ticket and one older/archived ticket, digits only): ")
     for ticket_id in [t for t in raw.split() if t.isdigit()]:
         def ticket(tid=ticket_id):
-            body = client.get(f"tickets/{tid}", {"include": "conversations,requested_for,stats"})
-            t = body.get("ticket", {})
-            convs = t.get("conversations", [])
-            return {
-                "ticket_shape": describe(t),
-                "private_notes": sum(1 for c in convs if c.get("private")),
-                "any_note_mentions_denial": any(mentions_denial(c.get("body_text")) for c in convs),
-            }
+            body = client.get(f"tickets/{tid}", {"include": "requester,requested_for,stats"})
+            return {"ticket_shape": describe(body.get("ticket", {}))}
 
         def items(tid=ticket_id):
             body = client.get(f"tickets/{tid}/requested_items")
             return {"requested_items_shape": describe(body)}
 
-        step(report, f"ticket {ticket_id}", ticket)
-        step(report, f"ticket {ticket_id} requested_items", items)
+        def approvals(tid=ticket_id):
+            return {"approvals_shape": describe(client.get(f"tickets/{tid}/approvals"))}
+
+        def conversations(tid=ticket_id):
+            convs = list(client.get_all(f"tickets/{tid}/conversations", "conversations"))
+            return {"conversation_count": len(convs),
+                    "private_notes": sum(1 for c in convs if c.get("private")),
+                    "any_note_mentions_denial": denial_snippet([c.get("body_text") for c in convs]) is not None,
+                    "conversation_shape": describe(convs[0]) if convs else None}
+
+        def bundle(tid=ticket_id):
+            fetcher = Fetcher(client)
+            fetcher.load_statuses()
+            b = fetcher.ticket_bundle(int(tid))
+            emails = [p.get("email") for p in (b.get("requester"), b.get("requested_for"), b.get("recipient")) if p]
+            practices, ad_problem = ad_practices(emails)
+            return {"normalized_bundle_shape": describe(b),
+                    "recipient_resolved": bool((b.get("recipient") or {}).get("email")),
+                    "certificate_attached": any(is_certificate(n) for n in b.get("attachments", [])),
+                    "ad_practice_lookup": {"emails_checked": len(set(e.lower() for e in emails if e)),
+                                           "found": len(practices), "problem": ad_problem},
+                    "fetcher_notes": fetcher.notes}
+
+        def lookups(tid=ticket_id):
+            t = client.get(f"tickets/{tid}").get("ticket", {})
+            results = {}
+            for label, path in (("requester", f"requesters/{t.get('requester_id')}"),
+                                ("requester_as_agent", f"agents/{t.get('requester_id')}"),
+                                ("assignee_agent", f"agents/{t.get('responder_id')}"),
+                                ("department", f"departments/{t.get('department_id')}")):
+                try:
+                    results[label] = {"ok": True, "shape": describe(client.get(path))}
+                except FreshserviceError as err:
+                    results[label] = {"ok": False, "error": str(err)}
+            return {"lookups": results}
+
+        for label, func in (("", ticket), (" requested_items", items), (" approvals", approvals),
+                            (" conversations", conversations), (" lookups", lookups), (" normalized", bundle)):
+            step(report, f"ticket {ticket_id}{label}", func)
 
     print(json.dumps(report, indent=2))
     try:

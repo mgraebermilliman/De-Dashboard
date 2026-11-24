@@ -40,7 +40,7 @@ This dashboard shows employee names, request history, and possibly Certificates 
 ## 5. Security
 
 1. Follow the OWASP Top 10. Validate and escape all user input, including the name search box. Use parameterized queries, and never build SQL or HTML from raw strings.
-2. Don't turn off TLS or certificate checks.
+2. Don't turn off TLS or certificate checks. *Approved exception (Kevin, 2026-11-20):* `extract/freshservice.py` clears only Python 3.13's `VERIFY_X509_STRICT` flag, because of an outdated Zscaler root. Certificate chain and hostname verification stay on. Don't widen this exception.
 3. Add only well-known, maintained dependencies, and pin their versions. Tell the user why each new dependency is needed.
 4. Downloaded certificates must come from the matching Freshservice ticket attachment only. Never accept an arbitrary file path or URL from the user.
 

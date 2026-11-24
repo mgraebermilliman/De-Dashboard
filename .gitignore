@@ -4,6 +4,10 @@
 # Extracted data contains real employee information and must never be committed
 data/
 
+# Generated files (recreate with: python run.py mock)
+sample_data/*.xlsx
+*.tmp.xlsx
+
 # Python
 __pycache__/
 *.pyc

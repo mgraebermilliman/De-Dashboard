@@ -1,0 +1,31 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode"]
+
+annotation PBI_QueryOrder = ["Requests","People","PersonRequests","FormAnswers","RunLog","DimDate","GapBuckets","_Measures","WorkbookPath","Workbook"]
+
+ref table Requests
+ref table People
+ref table PersonRequests
+ref table FormAnswers
+ref table RunLog
+ref table DimDate
+ref table GapBuckets
+ref table _Measures
+ref table DateTableTemplate_9d1b3583-3207-4d16-a0cf-a7ca7d0930e2
+ref table LocalDateTable_4660595b-909e-4a40-aa8c-5ff316f42a77
+ref table LocalDateTable_a3387b78-4398-4d56-aab1-a1472eaa283d
+
+ref role 'Program Owners'
+
+ref cultureInfo en-US
+

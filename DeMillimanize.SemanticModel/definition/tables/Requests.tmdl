@@ -1,0 +1,364 @@
+table Requests
+	lineageTag: 88927ef5-ec2c-4fea-8bc0-8ee5b29acc6f
+
+	column 'Ticket ID'
+		dataType: int64
+		formatString: 0
+		displayFolder: Ticket
+		lineageTag: d8566bf1-bfdb-4014-b47c-f87b5e356868
+		summarizeBy: none
+		sourceColumn: Ticket ID
+
+	column 'Ticket URL'
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: ecc012b9-e458-4006-9857-77f47e6853e9
+		dataCategory: WebUrl
+		summarizeBy: none
+		sourceColumn: Ticket URL
+
+	column 'Created Date'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		displayFolder: Ticket
+		lineageTag: 58b17baf-7600-41ea-86d5-ae4c43c979e3
+		summarizeBy: none
+		sourceColumn: Created Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Requester Name'
+		dataType: string
+		displayFolder: People
+		lineageTag: 14aa21b5-a285-4b82-a866-b5a9d5767325
+		summarizeBy: none
+		sourceColumn: Requester Name
+
+	column 'Requester Email'
+		dataType: string
+		displayFolder: People
+		lineageTag: d5c25065-465e-408a-9546-cb4bf6c1ef4a
+		summarizeBy: none
+		sourceColumn: Requester Email
+
+	column Department
+		dataType: string
+		displayFolder: People
+		lineageTag: 92cb36ad-7c30-41cd-93da-cc2e89a926ad
+		summarizeBy: none
+		sourceColumn: Department
+
+	column 'Computer Provided To'
+		dataType: string
+		displayFolder: People
+		lineageTag: 217dd17c-4719-472e-ab0c-2e2efbd3d60d
+		summarizeBy: none
+		sourceColumn: Computer Provided To
+
+	column 'Recipient Differs From Requester'
+		dataType: string
+		displayFolder: People
+		lineageTag: d39248bc-defd-4e64-a4aa-7047ef6f0b72
+		summarizeBy: none
+		sourceColumn: Recipient Differs From Requester
+
+	column 'Requested For'
+		dataType: string
+		displayFolder: People
+		lineageTag: 1716bdd5-3a17-433c-b814-6f0aea34015c
+		summarizeBy: none
+		sourceColumn: Requested For
+
+	column Outcome
+		dataType: string
+		displayFolder: Outcome
+		lineageTag: 844d5410-ee1b-48b9-bf8f-8290b7f682e0
+		summarizeBy: none
+		sourceColumn: Outcome
+
+	column 'Outcome Source'
+		dataType: string
+		displayFolder: Outcome
+		lineageTag: cb2f0491-dcfe-408c-88a4-72729025ecf7
+		summarizeBy: none
+		sourceColumn: Outcome Source
+
+	column 'Outcome Evidence'
+		dataType: string
+		displayFolder: Outcome
+		lineageTag: ed177ce3-812a-4e58-906e-fa5e8cae986b
+		summarizeBy: none
+		sourceColumn: Outcome Evidence
+
+	column Approver
+		dataType: string
+		displayFolder: Outcome
+		lineageTag: beaccf1a-2441-4962-aad6-93e3979f9eff
+		summarizeBy: none
+		sourceColumn: Approver
+
+	column 'Decision Date'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		displayFolder: Outcome
+		lineageTag: 49b2f1fc-a5fe-4db9-91df-f0a072bb94d4
+		summarizeBy: none
+		sourceColumn: Decision Date
+
+	column 'Device Type'
+		dataType: string
+		displayFolder: Device
+		lineageTag: 1922004b-4f51-488b-8bf3-db73615a38b7
+		summarizeBy: none
+		sourceColumn: Device Type
+
+	column 'PC Make and Model'
+		dataType: string
+		displayFolder: Device
+		lineageTag: ca91a208-d5d6-4a3c-be53-3307f6f752b4
+		summarizeBy: none
+		sourceColumn: PC Make and Model
+
+	column 'PC Serial Number'
+		dataType: string
+		displayFolder: Device
+		lineageTag: 207a6439-ba79-450b-ba39-945ce5c30b66
+		summarizeBy: none
+		sourceColumn: PC Serial Number
+
+	column 'Most Recent PC Name'
+		dataType: string
+		displayFolder: Device
+		lineageTag: 95f119e0-c9c1-4ccb-891c-544d49512992
+		summarizeBy: none
+		sourceColumn: Most Recent PC Name
+
+	column 'Frequent (Requester)'
+		dataType: string
+		displayFolder: Frequency
+		lineageTag: 807bd2d0-e1b0-49a4-901c-2332db035a37
+		summarizeBy: none
+		sourceColumn: Frequent (Requester)
+
+	column 'Requester Request #'
+		dataType: int64
+		formatString: 0
+		displayFolder: Frequency
+		lineageTag: b07f43a9-3f3e-4680-9192-7b1df4523210
+		summarizeBy: none
+		sourceColumn: Requester Request #
+
+	column 'Days Since Previous (Requester)'
+		dataType: int64
+		formatString: 0
+		displayFolder: Frequency
+		lineageTag: 9c691479-538a-406e-ac65-e8f44110e4fa
+		summarizeBy: none
+		sourceColumn: Days Since Previous (Requester)
+
+	column 'Frequent (Recipient)'
+		dataType: string
+		displayFolder: Frequency
+		lineageTag: 1fbd9120-34b9-4194-945b-5950c8834271
+		summarizeBy: none
+		sourceColumn: Frequent (Recipient)
+
+	column 'Recipient Request #'
+		dataType: int64
+		formatString: 0
+		displayFolder: Frequency
+		lineageTag: 8026c440-7f4f-4c91-8d94-3451734cfa14
+		summarizeBy: none
+		sourceColumn: Recipient Request #
+
+	column 'Days Since Previous (Recipient)'
+		dataType: int64
+		formatString: 0
+		displayFolder: Frequency
+		lineageTag: b987b738-bdda-4adf-8390-40bc36e62acb
+		summarizeBy: none
+		sourceColumn: Days Since Previous (Recipient)
+
+	column 'Same Serial Seen Before'
+		dataType: string
+		displayFolder: Frequency
+		lineageTag: fd16138a-b95a-4390-9173-047ad8784a4a
+		summarizeBy: none
+		sourceColumn: Same Serial Seen Before
+
+	column 'Holiday Season'
+		dataType: string
+		displayFolder: Frequency
+		lineageTag: 9a1b4d5a-f882-4b73-a487-e4145741be51
+		summarizeBy: none
+		sourceColumn: Holiday Season
+
+	column 'Certificate Attached'
+		dataType: string
+		displayFolder: Device
+		lineageTag: dc7153e6-0ab6-4804-8328-fb2e863b8571
+		summarizeBy: none
+		sourceColumn: Certificate Attached
+
+	column 'Certificate File'
+		dataType: string
+		displayFolder: Device
+		lineageTag: 8c68608c-c457-42e6-87e7-9db9047b5ae1
+		summarizeBy: none
+		sourceColumn: Certificate File
+
+	column 'Certificate Missing'
+		dataType: string
+		displayFolder: Device
+		lineageTag: 637effa8-f9ab-48bf-9f76-e2c92df8e56d
+		summarizeBy: none
+		sourceColumn: Certificate Missing
+
+	column 'Match Source'
+		dataType: string
+		displayFolder: Matching
+		lineageTag: 93c08447-caf0-4bc4-9482-9afd8844e37c
+		summarizeBy: none
+		sourceColumn: Match Source
+
+	column 'Matched Phrase'
+		dataType: string
+		displayFolder: Matching
+		lineageTag: c31ababd-4681-43a9-97c3-8c1784cb15dc
+		summarizeBy: none
+		sourceColumn: Matched Phrase
+
+	column 'Matched Field'
+		dataType: string
+		displayFolder: Matching
+		lineageTag: 06de06c4-465d-48b2-b3ad-28c2ad6548a5
+		summarizeBy: none
+		sourceColumn: Matched Field
+
+	column 'Match Needs Review'
+		dataType: string
+		displayFolder: Matching
+		lineageTag: b9be79f7-eff6-4e82-8563-a97b418890a8
+		summarizeBy: none
+		sourceColumn: Match Needs Review
+
+	column 'Ticket Type'
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: 80968cc0-9945-4d08-85f6-4bfac60efbb5
+		summarizeBy: none
+		sourceColumn: Ticket Type
+
+	column Status
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: 94f4fbea-cbdf-458a-9d88-5281b813392a
+		summarizeBy: none
+		sourceColumn: Status
+
+	column 'Item Stage'
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: 147a8947-d242-405e-affc-09e427a57172
+		summarizeBy: none
+		sourceColumn: Item Stage
+
+	column 'Closed Date'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		displayFolder: Ticket
+		lineageTag: fa486d64-cc59-458d-8e73-758b8211b542
+		summarizeBy: none
+		sourceColumn: Closed Date
+
+	column Subject
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: fd1f90e1-ecfb-4c20-91ad-dc3284d447d6
+		summarizeBy: none
+		sourceColumn: Subject
+
+	column 'Resolution Note'
+		dataType: string
+		displayFolder: Ticket
+		lineageTag: 102e87d3-99c3-4794-9467-a2522ddf4964
+		summarizeBy: none
+		sourceColumn: Resolution Note
+
+	column 'Last Updated'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		displayFolder: Ticket
+		lineageTag: 16f0d285-5ffc-4b69-b90d-422279c1d98b
+		summarizeBy: none
+		sourceColumn: Last Updated
+
+	column 'Requester Is Technician'
+		dataType: string
+		displayFolder: People
+		lineageTag: 0f6798d2-1ae6-46f4-b917-14a24162e759
+		summarizeBy: none
+		sourceColumn: Requester Is Technician
+
+	column 'Recipient Is Technician'
+		dataType: string
+		displayFolder: People
+		lineageTag: 74fa296e-e921-46df-9c20-da3f2d58aade
+		summarizeBy: none
+		sourceColumn: Recipient Is Technician
+
+	partition Requests = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="Requests", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Ticket ID", Int64.Type},
+										{"Ticket URL", type text},
+										{"Created Date", type date},
+										{"Requester Name", type text},
+										{"Requester Email", type text},
+										{"Department", type text},
+										{"Computer Provided To", type text},
+										{"Recipient Differs From Requester", type text},
+										{"Requested For", type text},
+										{"Outcome", type text},
+										{"Outcome Source", type text},
+										{"Outcome Evidence", type text},
+										{"Approver", type text},
+										{"Decision Date", type datetime},
+										{"Device Type", type text},
+										{"PC Make and Model", type text},
+										{"PC Serial Number", type text},
+										{"Most Recent PC Name", type text},
+										{"Frequent (Requester)", type text},
+										{"Requester Request #", Int64.Type},
+										{"Days Since Previous (Requester)", Int64.Type},
+										{"Frequent (Recipient)", type text},
+										{"Recipient Request #", Int64.Type},
+										{"Days Since Previous (Recipient)", Int64.Type},
+										{"Same Serial Seen Before", type text},
+										{"Holiday Season", type text},
+										{"Certificate Attached", type text},
+										{"Certificate File", type text},
+										{"Certificate Missing", type text},
+										{"Match Source", type text},
+										{"Matched Phrase", type text},
+										{"Matched Field", type text},
+										{"Match Needs Review", type text},
+										{"Ticket Type", type text},
+										{"Status", type text},
+										{"Item Stage", type text},
+										{"Closed Date", type datetime},
+										{"Subject", type text},
+										{"Resolution Note", type text},
+										{"Last Updated", type datetime},
+										{"Requester Is Technician", type text},
+										{"Recipient Is Technician", type text}
+					}),
+					Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

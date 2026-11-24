@@ -2,54 +2,83 @@
 
 > **This file must be updated with every change.** See [AGENTS.md](AGENTS.md#8-required-on-every-change).
 
-**Last updated:** 2026-11-19
+**Last updated:** 2026-11-24
 
 ## Current status
 
-**Phase:** Building, stage 1 (API discovery). The read-only API client, ticket-matching rules, and an API probe script are written and unit-tested with fake data. **The probe has not been run against Freshservice yet.** It has to be run as the ADM account. No Power BI report yet.
+**Phase:** Building, stage 2. Michael's Power BI specification has been merged into the project. The full extract (Freshservice → Excel workbook in Michael's schema), a fake-data workbook, the Power BI model script, the theme and the build guide are written.
+
+- **Tested:** 45 unit tests pass, including a full extract run against a fake Freshservice client. Excel opens the mock workbook with all 5 named tables. The TMDL model applied and refreshed in Power BI Desktop with mock data. The live probe worked against the correct host.
+- **Not tested:** the 4 generated report pages (`python run.py pages`) have not been opened in Power BI Desktop yet; the full live extract has not been run.
 
 ## Requirements summary
 
 | # | Requirement | Priority | Status |
 |---|---|---|---|
-| R1 | Search by employee name | Must | Not started |
-| R2 | Show request date and outcome (given / denied / pending) per request | Must | Not started |
-| R3 | Pull De-Millimanize tickets from Freshservice (read-only), both form and legacy | Must | Not started |
-| R4 | Total count of completed De-Millimanize tickets | Should | Not started |
-| R5 | Flag repeat requests within a short window (e.g., 3 months) | Should | Not started |
-| R6 | Requests by practice (visual) | Nice | Not started |
-| R7 | Requests by device type (visual) | Nice | Not started |
-| R8 | Link to the ticket's Certificate of Destruction | Nice | Not started |
+| R1 | Search by employee name (as requester **and** as recipient) | Must | Model done (People + PersonRequests); page not built |
+| R2 | Show request date and outcome (Approved / Denied / Pending / Needs Review) per request | Must | Extract done; page not built |
+| R3 | Pull De-Millimanize tickets from Freshservice (read-only), both form and legacy | Must | Code done; not run live |
+| R4 | Total count of completed De-Millimanize tickets | Should | Measures done |
+| R5 | Flag repeat requests within 120 days (Frequent) | Should | Extract done |
+| R6 | Requests by practice (AD practice of the person receiving the device) | Nice | Extract done; page not built |
+| R7 | Requests by device type | Nice | Extract done; page not built |
+| R8 | Link to the ticket's Certificate of Destruction | Nice | Ticket URL and certificate flags done |
+| R9 | Abuse patterns: holiday season, devices for others, duplicate serials (from Michael's spec) | Should | Extract and measures done; page not built |
+| R10 | Data quality and refresh health: Needs Review worklists and RunLog (from Michael's spec) | Should | Extract and measures done; page not built |
 
 ## Architecture
 
-**Chosen by Kevin (2026-11-19):** add a small extract script between Freshservice and Power BI.
+**Chosen by Kevin (2026-11-19), merged with Michael's specification:** an extract script writes an Excel workbook, and Power BI only reads that workbook.
 
 ```mermaid
 flowchart LR
-    FS[Freshservice API<br/>read-only GET] --> EX[Extract script<br/>find tickets, classify,<br/>AD practice lookup]
-    AD[Active Directory<br/>read-only] --> EX
-    EX --> DATA[Data file<br/>restricted location,<br/>never in git]
-    DATA --> MODEL[Power BI data model]
-    MODEL --> RPT[Power BI report<br/>name search, history, counts]
-    RPT -->|link| TICKET[Freshservice ticket page<br/>COD attachment lives here]
+    FS[Freshservice API<br/>read-only GET] --> EX[Extract run.py extract<br/>ADM account, twice daily]
+    OV[outcome_overrides.csv<br/>manual decisions] --> EX
+    EX --> WB[DeMillimanize Requests.xlsx<br/>Requests, People, PersonRequests,<br/>FormAnswers, RunLog]
+    WB --> PBI[Power BI model<br/>WorkbookPath parameter]
+    PBI --> RPT[4 pages: Lookup, Overview,<br/>Frequent and Patterns, Detail]
+    RPT -->|link| TICKET[Freshservice ticket<br/>COD attachment]
 ```
 
-Why the extract step is proposed:
+Why there's an extract step instead of Power BI calling the API:
 
-- **API key:** The key is personal and stored in a Windows environment variable. Power BI can't read environment variables, but a script can.
+- **API key:** The key is personal and stored in a Windows environment variable. Power BI can't read environment variables, but a script can. Viewers never need a key.
 - **Legacy tickets:** Finding them takes fuzzy matching and a review list. That's much easier to write and test in a script than in Power Query.
-- **Practice:** It comes from an Active Directory lookup. `Get-ADUser` is available on the developer machine (checked 2026-11-19), and Power BI can't easily query AD without a gateway.
+- **Business rules:** Outcome, Frequent and technician handling are computed once in tested Python. Power BI surfaces them and never recomputes them.
 
 Trade-off: someone has to run the script, or schedule it on a machine, to refresh the data.
 
-**Runtime:** Python 3.13 with the **standard library only**, so there are no packages to install. Python is installed machine-wide at `C:\Program Files\Python313` and is on the machine PATH, so the ADM account can use it too (checked 2026-11-19). `uv` isn't used because it's installed per-user and the ADM account can't reach it.
+**Runtime:** Python 3.13, installed machine-wide at `C:\Program Files\Python313` (on the machine PATH, so the ADM account can use it). The only dependency is **openpyxl 3.1.5**, pinned in `requirements.txt`. It's needed to write Excel tables and was already installed machine-wide (checked 2026-11-19). `uv` isn't used because it's installed per-user and the ADM account can't reach it.
+
+### Workbook (data contract with Power BI)
+
+- **File:** `DeMillimanize Requests.xlsx`. It's in `data\` for now (git-ignored). The target is the CMH IT SharePoint library (folder still to be confirmed).
+- **Tables:** `Requests`, `People`, `PersonRequests`, `FormAnswers`, `RunLog`. Column names follow Michael's specification exactly, and the list lives in `extract/tables.py`.
+- **Additions to Michael's columns:**
+  - `Requests`: `Requester Is Technician`, `Recipient Is Technician`
+  - `People`: `Technician`
+  - `RunLog`: `Finished (Local)`, used for the "Last refreshed" label
+- **State:** `data\state\` holds the cached tickets and the run history used for incremental runs.
+
+### Power BI (`powerbi/`)
+
+- **`DeMillimanize.model.tmdl`:** A model script pasted into Desktop's TMDL view. It contains the tables, Power Query, DimDate, GapBuckets, 40+ measures, 4 relationships and the RLS role. It's generated from the schema by `python run.py tmdl`.
+- **`DeMillimanize.theme.json`:** Freshservice-style theme (navy `#12344D`, teal `#00C1A0`, outcome colors).
+- **`GUIDE.md`:** Setup, a page-by-page build guide, publish/refresh/share steps, the validation checklist and assumptions.
+- **Relationships:**
+  - People → PersonRequests (single direction)
+  - PersonRequests ↔ Requests (both directions, so a selected person filters Requests)
+  - DimDate → Requests on Created Date
+  - Requests → FormAnswers
+- **Fake data:** `sample_data/make_mock_workbook.py` creates a **fake** workbook so the report can be built now.
 
 ### Refreshing the data (decided 2026-11-19)
 
-- **Scheduled:** Task Scheduler runs the extract **twice daily** as the ADM account. Not built yet.
-- **Power BI Desktop Refresh button:** It reloads the latest data file. Power BI stays on the standard account.
-- **"Run extract now" shortcut:** Runs the extract as the ADM account on demand, before clicking Refresh. Not built yet.
+- **Scheduled:** `tools\schedule-extract.cmd` creates two Task Scheduler tasks (05:30 and 12:30) that run the extract as the ADM account. Written but not run yet.
+- **Power BI Service:** Schedule the refresh at 06:00 and 13:00, after the extract.
+- **Power BI Desktop Refresh button:** It reloads the latest workbook. Power BI stays on the standard account.
+- **"Run extract now":** `tools\run-extract.cmd` runs the extract as the ADM account on demand, before clicking Refresh.
+- **Run modes:** The first run is **Full** (tickets updated since 2015-01-01). Later runs are **Incremental** (since the last success, minus 2 days). `run.py extract --full` forces a full run. A failed run keeps the previous data and logs "Failed" in RunLog.
 
 Power BI reports show the data from the **last refresh**. They don't fetch new data just because someone opens the report.
 
@@ -61,10 +90,26 @@ Power BI reports show the data from the **last refresh**. They don't fetch new d
 
 **First probe run (2026-11-19):** The launcher worked and the ADM account read `FRESHSERVICE_API_KEY`. The UNC path worked. The call failed with 404 because of the wrong host (see above).
 
+**Second probe run (2026-11-20), against `milliman-helpdesk.freshservice.com`:** This run **worked**. Results (field names and types only):
+
+- **Reads that succeeded:**
+  - The key belongs to an agent.
+  - 81,015 tickets created since 2015.
+  - Ticket 653455, with its requested items, approvals, conversations and the normalized bundle.
+- **Status choices:** 2 Open, 3 Pending, 4 Resolved, 5 **Closed**, 6 Waiting on Approval, 7 Waiting on GCS, 8 Approved, 9 Waiting on Child Ticket, 10 Waiting on Requester Response.
+- **`GET /agents` returns HTTP 403** with this key. Technicians are therefore also taken from **ticket assignees** (`responder_id`); the procedure has the technician assign the form ticket to themselves.
+- **The ticket list includes `description_text`**, so older tickets that only mention De-Millimanize in the description are found.
+- **"Computer provided to" is a user ID** (`computer_provided_to`, no numeric suffix on this item). It resolves to a name and email **only when it matches the ticket's requester or requested-for**. Any other ID can't be looked up while person reads return 403, so it shows as "Unknown user (ID n)".
+- **Certificate PDF:** it's attached to the **requested item**, not the ticket. The extract now reads both.
+- **Ticket-level approval:** the ticket has `approval_status_name`. It's used when the approvals list is empty.
+- **Person and department reads are denied (HTTP 403):** `/requesters/{id}`, `/agents/{id}` and `/departments/{id}` all return 403 with this key (probe lookups step, 2026-11-20). Names and emails still come from the ticket itself (`include=requester,requested_for`). The extract stops calling a lookup after its first 403, so denied calls don't use up the rate limit.
+
 **Lessons from the Spark project** (from SPARK's source, summarized in `O:\Notes\SPARK Freshservice API Connection.md`, branch `SPARK-PCR-KEVIN`):
 
-- These GET paths work in SPARK: `/agents/me`, `/tickets/{id}`, `/tickets/{id}/requested_items` (form answers are under `custom_fields`), `/tickets/{id}/conversations?per_page=100&page=N`, `/requesters/{id}`, and `/departments/{id}`.
-- **Practice:** SPARK treats the Freshservice **department name** as the practice. It follows ticket or requester `department_id` to `GET /departments/{id}`. That's a Freshservice-only option alongside AD; SPARK also has an AD organizational-unit lookup.
+- SPARK calls these GET paths: `/agents/me`, `/tickets/{id}`, `/tickets/{id}/requested_items` (form answers are under `custom_fields`), `/tickets/{id}/conversations?per_page=100&page=N`, `/requesters/{id}` and `/departments/{id}`. **`/requesters/{id}` and `/departments/{id}` return 403 with this key, in SPARK too.** SPARK's latest commit explains these 403s to agents as missing permission to look up the employee's profile.
+- **How SPARK works around it:**
+  - A **local department table** (`Services/DriveMappings.cs`, 18 department IDs). It calls `/departments/{id}` only for IDs that aren't in the table.
+  - **Practice from Active Directory** (`Services/AdUserPracticeLookupService.cs`): find the user by email or name, then take the practice OU code (for example `OU=CMH` → `CMH`) from their distinguished name, using `GroupMappings.PracticeToAdminOUMap`. This project copies both.
 - **Status numbers SPARK uses:** 2 Open, 3 Pending, 4 Resolved, 6 Waiting on Customer, and 8 In Progress. The number for Closed isn't in SPARK, so the probe's status list will confirm it.
 - SPARK's queries are limited to one agent and read only the first page. The dashboard needs all agents plus paging.
 - Spark's API key could **submit** service requests but **couldn't read catalog definitions**. Our key may have similar read limits.
@@ -119,7 +164,12 @@ There are **two kinds** of De-Millimanize tickets.
 
 **Technician-listed tickets:** For charity devices, the procedure has the technician enter **their own name** in "Computer provided to." If that name matches a Freshservice **agent**, the ticket is placed in a separate **Technician-listed (possible charity)** category. It doesn't count toward that person's own request history. (Confirmed by Kevin, 2026-11-19.)
 
-**Practice:** The form doesn't record it. For recipients who aren't technicians, practice comes from an **Active Directory lookup** of the recipient. Which AD attribute holds practice is still to be confirmed.
+**Practice:** The form doesn't record it, and Freshservice person and department reads return 403 with this key. Practice comes from **Active Directory by email**, using SPARK's method (`extract/practices.py`):
+
+- The extract makes one read-only PowerShell `DirectorySearcher` call per run. It finds each email by `mail` or `userPrincipalName` and takes the practice OU code from the distinguished name.
+- `People[Department]` = the person's AD practice code (for example `CMH`). It's blank if the person isn't found in AD.
+- `Requests[Department]` = the practice of the person **receiving** the device (the recipient, or the requester when there isn't one). If that's unknown, it falls back to the ticket's Freshservice department, taken from SPARK's local table of 18 IDs. For form tickets, the ticket's own department is usually IT's, so it's only the fallback.
+- People who aren't found in AD are counted in the RunLog message.
 
 ### 2. Legacy tickets (created before the form existed)
 
@@ -129,17 +179,42 @@ There are **two kinds** of De-Millimanize tickets.
 - Some have an **approval** (approver plus Approved status) attached.
 - At least some are **Archived** in Freshservice. We still need to confirm whether the API returns archived tickets.
 
-### Outcome mapping
+### Business rules (implemented in `extract/classify.py` and `extract/tables.py`)
 
-| Source data | Dashboard outcome | Source |
-|---|---|---|
-| Status = Closed | **Completed (given)** | Confirmed by Kevin, 2026-11-19 |
-| Any other status | **Not completed**, with the actual Freshservice status shown | No guessing. The real status is displayed. |
-| Denial wording in a **private note** | **Possible denial: review** | Proposed. Never labeled "Denied" without a person checking it. |
-| Legacy approval with a non-approved status | **Possible denial: review** | Proposed |
-| Anything not recognized | **Unknown** | Per [AGENTS.md](AGENTS.md) rule 1.4 |
+**Matching (Match Source):**
 
-**Denials:** Kevin doesn't know of any denied request. A denied request probably never gets a form ticket, and any denial would most likely be recorded only in a ticket's **private notes**. So the dashboard can only *flag* possible denials, not count them for certain.
+| Match Source | Meaning |
+|---|---|
+| Form | The requested item is the De-Millimanize catalog item |
+| Phrase | The subject or description matches the spelling-variant pattern, which covers older tickets. These rows get `Match Needs Review = Yes` |
+| Both | Both of the above |
+
+**Outcome** (Approved / Denied / Pending / Needs Review). The first rule that applies wins:
+
+| Order | Source data | Outcome | Outcome Source |
+|---|---|---|---|
+| 1 | A row in `data\outcome_overrides.csv` | As written there | Manual Override |
+| 2 | Latest approver decision: approved or rejected | Approved / Denied | Approval |
+| 3 | Status Closed, no denial wording in notes or resolution note | **Approved**. Kevin confirmed Closed = given | Closed ticket text |
+| 4 | Status Closed **with** denial wording | **Needs Review**. Never an automatic Denied; a person confirms it with an override | Closed ticket text |
+| 5 | Any other known status | Pending | Status: <name> |
+| 6 | Status can't be read | Needs Review | Unknown status |
+
+**Frequent:** The same person has another request within the previous **120 days**. It's computed separately for the requester and for the recipient.
+
+- **Recipient** = "Computer provided to", or else "Requested For" when that differs from the requester.
+- **Technicians** (Freshservice agents) are excluded as requester, because they file forms for others. They're also excluded as recipient, because charity devices are listed under the technician.
+- `People[Frequent]` also compares requests across roles, so a person asking once for themselves and later being named on a form is caught.
+
+**Other rules:**
+
+- **Holiday Season:** Nov 15 through Jan 5.
+- **Same Serial Seen Before:** The serial appeared on an earlier ticket.
+- **Certificate Missing:** A closed form ticket with no `Certificate-*.pdf` attachment.
+- **Device Type:** From model families. ThinkPad, Latitude, EliteBook and similar = Laptop. ThinkCentre, OptiPlex and similar = Desktop. Otherwise Freshservice sub-category Laptop or Desktop, otherwise Unknown.
+- **Profile counts:** People[Approved / Denied / Pending / Needs Review] cover only requests where the person is the one receiving the device.
+
+**Denials:** Kevin doesn't know of any denied request. A denied request probably never gets a form ticket, and any denial would most likely be recorded only in a ticket's notes. So the dashboard flags possible denials as Needs Review, and a person confirms them through the override file.
 
 ## Key decisions
 
@@ -156,18 +231,30 @@ There are **two kinds** of De-Millimanize tickets.
 | 2026-11-19 | Scheduled extract runs twice daily. Desktop Refresh reloads the file, and a separate "Run extract now" shortcut runs as ADM. | Chosen by Kevin. Keeps Power BI off the admin account. |
 | 2026-11-19 | Extract uses the Python standard library only | Nothing to install, it works for the ADM account, and it keeps dependencies to a minimum (AGENTS.md rule 5.3) |
 | 2026-11-19 | The API client is GET-only, https-only, refuses redirects, and only sends the key to the configured host | Enforces AGENTS.md section 2 and protects the API key |
+| 2026-11-19 | Merged Michael's Power BI specification: Excel workbook contract, 5 tables, 4 pages, measures, theme, RLS | Michael's spec covers the report, and our extract is the "daily job" it assumed |
+| 2026-11-19 | Outcome vocabulary is Approved / Denied / Pending / Needs Review, with a manual override file | Michael's spec. It keeps our rule that denial wording means Needs Review, not an automatic Denied |
+| 2026-11-19 | Frequent window is 120 days (was "about 3 months") | Michael's spec |
+| 2026-11-19 | Practice is the Freshservice department, not AD | Michael's schema has Department, SPARK already uses it, and it needs no extra access. **Superseded 2026-11-20, see below.** |
+| 2026-11-19 | Use openpyxl (pinned 3.1.5) instead of the standard library only | Excel named tables are needed for Power BI. It was already installed machine-wide |
+| 2026-11-19 | Model delivered as a TMDL script plus a build guide, not a full `.pbip` | Michael's spec allows this fallback. A hand-written report file can't be tested here and could fail to open |
+| 2026-11-20 | Practice comes from **Active Directory by email** (SPARK's method), with SPARK's local department table as the fallback | Freshservice `/requesters/{id}` and `/departments/{id}` return 403 with this key. The alternative is a key permission change (open question 2) |
+| 2026-11-20 | Stop calling a Freshservice lookup after its first 403 in a run | A 403 won't change mid-run, and repeated calls waste the rate limit |
+| 2026-11-20 | Clear only Python 3.13's `VERIFY_X509_STRICT` flag for Freshservice TLS (approved by Kevin) | Windows trusts two Zscaler roots with the same name. The older one (expires 2042, thumbprint `D72F47D8…`) lacks a critical Basic Constraints flag, so 3.13's strict check failed for the ADM account. Chain and hostname are still verified, as in Python 3.12 |
 
 ## Open questions
 
 1. **Power BI licensing:** This isn't a blocker for building, because Power BI Desktop is free. It needs to be revisited **before publishing**.
-2. **ADM scheduled task:** Is IT policy OK with a scheduled task running under an ADM account? Long term, should refreshes use a dedicated service key?
+2. **ADM scheduled task:** Is IT policy OK with a scheduled task running under an ADM account? Long term, should refreshes use a dedicated service key? A key whose agent role **can view requesters and departments** would also let practice come from Freshservice directly, and would resolve "Computer provided to" IDs that don't match the requester or requested-for. Ask the Freshservice admin.
 3. **Archived tickets:** Can the API return them? Run the probe with an archived ticket number to check.
-4. **Practice:** Which Active Directory attribute holds practice (for example `department`, `company`, or `division`)?
-5. **Data file location:** It's in `data\` inside the project folder for now (git-ignored). It moves to the secure drive in a later stage.
-6. **ADM access to the project folder:** Can the ADM account read and write Kevin's home share? The probe will show this.
-7. **"Computer provided to" format:** Is it free text, an email address, or a user ID? The probe's requested-items output will show this, and it determines how the AD lookup works.
-8. **Ticket links for Shannon:** Should ticket links use the portal address (`hd.milliman.com`) or `milliman-helpdesk.freshservice.com`? The portal address is probably the one people know.
-9. **Practice source:** Should it be the Freshservice department name (as in SPARK), or AD?
+4. **SharePoint location:** Which CMH IT library and folder will hold the workbook, and how does the extract machine write there (OneDrive sync with `DEDASH_DATA_DIR`, or an upload step)? A local or UNC path in the Power BI Service needs a gateway.
+5. **Data file location (current):** It's in `data\` inside the project folder (git-ignored).
+6. **ADM access to the project folder:** **Confirmed (2026-11-20).** The ADM account saved `data\probe_report.json`.
+7. **"Computer provided to" format:** **Answered (2026-11-20).** It's a Freshservice user ID.
+8. **Ticket links for Shannon:** They currently use `milliman-helpdesk.freshservice.com/a/tickets/<id>`. Should they use `hd.milliman.com` instead? Change this with `DEDASH_TICKET_URL_BASE`.
+9. **Approvals API:** **Partly answered (2026-11-20).** `/tickets/{id}/approvals` works but was empty for 653455. The shape of a real approval is still unseen. Probe a ticket that had an approval (for example legacy ticket 495852).
+10. **Ticket list includes `description_text`:** **Answered (2026-11-20).** Yes.
+11. **Person and department lookups:** **Answered (2026-11-20).** They return HTTP 403; the key's agent role can't read requester, agent or department records. Practice now comes from AD (see Practice above).
+12. **Outdated Zscaler root:** Should IT remove the older Zscaler root (expires 2042, thumbprint `D72F47D8…`) from the Windows trusted roots? Then the strict-check exception could be removed.
 
 ## Change log
 
@@ -181,3 +268,13 @@ There are **two kinds** of De-Millimanize tickets.
 | 2026-11-19 | Kevin Concepcion (with AI agent) | Fixed the probe launcher. "Run as different user" did nothing, because the ADM account has no `O:` drive. `probe.cmd` now finds the folder's UNC path (`run.py unc`) and uses `runas` to start the probe as the ADM account, which loads its profile so `FRESHSERVICE_API_KEY` is available. **Tested:** UNC lookup returns the correct path, and tests still pass. **Not tested:** the `runas` step, which needs the ADM password. |
 | 2026-11-19 | Kevin Concepcion (with AI agent) | First live probe run: the launcher, the ADM key, and the UNC path all worked, but `hd.milliman.com` returned 404 for the API. Reviewed Spark's notes for Freshservice lessons (read-permission limits, field-name suffixes, Okta for practice). |
 | 2026-11-19 | Kevin Concepcion (with AI agent) | Found the cause of the 404: wrong host. Switched the default API host to `milliman-helpdesk.freshservice.com`, as used by SPARK. Added an `agents/me` key check to the probe. **Tested:** the config resolves the new host, and 16 unit tests pass. **Not tested:** a live probe against the new host. |
+| 2026-11-19 | Kevin Concepcion (with AI agent) | Merged Michael's Power BI prompt with the project. Added the full extract (`fetch.py`, `tables.py`, `workbook.py`, `run_extract.py`) writing his 5-table workbook, plus outcome rules, overrides, technician handling, incremental runs and RunLog. Added a fake-data workbook generator, the Power BI model script generator and TMDL, the theme, `powerbi/GUIDE.md`, `tools/run-extract.cmd`, `tools/schedule-extract.cmd` and `requirements.txt`. Updated the probe to show approvals, conversations and normalized-bundle shapes. **Tested:** 40 unit tests pass, including a fake-client end-to-end run with full, incremental and failure runs; Excel opens the mock workbook with 5 named tables; the theme JSON parses. **Not tested:** live API calls, the TMDL in Desktop, scheduled tasks, report pages. |
+| 2026-11-20 | Kevin Concepcion (with AI agent) | Second probe run succeeded on `milliman-helpdesk.freshservice.com`; confirmed that `hd.milliman.com` is the portal address only. Fixed the extract to match the real data: recipient user IDs resolved from the ticket's requester or requested-for, certificate read from form-item attachments, ticket-level `approval_status_name` used as a fallback, technicians taken from ticket assignees because `/agents` is 403, and lookup failures reported in RunLog. Added a `lookups` step to the probe. Updated the offline test to the real response shapes. **Tested:** 40 unit tests pass. **Not tested:** a live extract run. |
+| 2026-11-20 | Kevin Concepcion (with AI agent) | Handled the 403s on person and department reads the way SPARK does. Added `extract/practices.py`, containing SPARK's local department table and practice OU codes, plus a read-only AD lookup by email through PowerShell `DirectorySearcher`. `People[Department]` and `Requests[Department]` now use the recipient's (or requester's) AD practice. Lookups stop after their first 403. Added `tests/test_practices.py`, and the fake client now returns 403 for person and department reads like the real key. **Tested:** 44 unit tests pass; a live AD lookup resolved Kevin's own email to `CMH`, and a made-up email was reported as not found. **Not tested:** a live extract run. |
+| 2026-11-20 | Kevin Concepcion (with AI agent) | Third probe run failed with `CERTIFICATE_VERIFY_FAILED: Basic Constraints of CA cert not marked critical` (ADM account). Cause: an older Zscaler root (2042) in the Windows store plus Python 3.13's strict X.509 check. With Kevin's approval, the client now clears only `VERIFY_X509_STRICT`, keeping chain and hostname verification. Recorded the exception in AGENTS.md 5.2. **Tested:** 45 unit tests pass, including a check that verification stays on; a verified handshake to Freshservice succeeded from the standard account. **Not tested:** a probe from the ADM account. |
+| 2026-11-20 | Kevin Concepcion (with AI agent) | Fourth probe run (ADM account, ticket 653455) **succeeded** with the TLS fix. Every expected step passed: the recipient was resolved, the certificate was found on the form item, and the AD practice lookup found 1 of 1. Person and agent reads returned the expected 403s, the department came from the local table, and `/agents` is still 403. Ticket 495852 (archived/legacy) wasn't probed yet. |
+| 2026-11-24 | Kevin Concepcion (with AI agent) | First Apply of the TMDL script in Power BI Desktop failed: `Unsupported Table name "Measures"`, because that name is reserved. Renamed the measure table to `_Measures` in `make_model_script.py` and regenerated the TMDL. **Not tested:** re-applying in Desktop. Any of the other errors in Desktop's Problems tab (6 were reported) that remain are still unknown. |
+| 2026-11-24 | Kevin Concepcion (with AI agent) | Second Apply: all 6 problems were "Unexpected expression formatString / displayFolder" right after the first multi-line measure (`Avg Days to Decision`). TMDL view didn't accept the multi-line measure formulas, so `make_model_script.py` now writes every measure formula on one line (same DAX). Regenerated: 42 measures, all on one line. **Not tested:** re-applying in Desktop. |
+| 2026-11-24 | Kevin Concepcion | The TMDL script **applied and refreshed successfully** in Power BI Desktop with the mock workbook. The model, measures and relationships load. Report pages are not built yet. |
+| 2026-11-24 | Kevin Concepcion (with AI agent) | Added `powerbi/make_report_pages.py` (`python run.py pages`), which writes the 4 report pages from [powerbi/GUIDE.md](powerbi/GUIDE.md) into `DeMillimanize.Report/definition/pages` (PBIR format): Request Lookup (15 visuals), Overview (27), Frequent and Patterns (13), Ticket Detail and Data Quality (18). The earlier hand-made page was moved to `powerbi/page_backup_20261124`. Added 2 measures, `Frequent Color` and `Gap Bucket Color`, for conditional font colors. **Tested:** all 73 visual files are valid JSON with unique names; 45 unit tests pass. **Not tested:** opening the pages in Power BI Desktop. Left as manual steps: slicer search, sync slicers, clear-slicers button, drill-through, heatmap/data bars, per-outcome chart colors, holiday shading, top-10 department filter, turning off Auto date/time. |
+| 2026-11-24 | Kevin Concepcion (with AI agent) | Readability fixes after Kevin opened the pages in Desktop. **Request history was empty** for Alex Tech: the table held the `Days Since Previous (Role)` measure, and Power BI hides rows where every measure is blank. The table now uses plain columns (`Days Since Previous (Recipient)`). **Frequent people was empty** once a name was chosen: the name slicer no longer filters it. **Timeline scatter error**: its X axis is now the earliest Created Date. **Cut-off text**: slicer headers hidden (the title names them) and slicers made taller; mock/refresh banners made taller; message cards have no box; the profile is now a table (Person, Email, Department, Technician, Frequent) plus a counts card with short labels; every table has word wrap, fixed column widths that fit the visual, no total row, and a link icon for Ticket URL; All requests and Refresh log show key columns only (every column stays in the workbook); line charts are straight, the monthly chart's axis is categorical, and the donut legend is at the bottom. **Tested:** 74 visual files are valid JSON with unique names. **Not tested:** how Desktop renders the changes. |

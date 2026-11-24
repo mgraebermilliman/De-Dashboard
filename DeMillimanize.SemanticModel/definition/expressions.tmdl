@@ -1,0 +1,16 @@
+expression WorkbookPath = "O:\De-Dashboard\sample_data\DeMillimanize Requests.mock.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5fe01740-7a82-4662-9cf5-10d5f2de7006
+
+	annotation PBI_ResultType = Text
+
+expression Workbook =
+		let
+			// WorkbookPath can be a local/UNC file path or a SharePoint file URL (https://...).
+			Source = if Text.StartsWith(WorkbookPath, "http", Comparer.OrdinalIgnoreCase)
+				then Web.Contents(WorkbookPath)
+				else File.Contents(WorkbookPath),
+			Book = Excel.Workbook(Source, null, true)
+		in
+			Book
+	lineageTag: 2cef2eae-2135-4a09-9da6-268d9e0858c6
+

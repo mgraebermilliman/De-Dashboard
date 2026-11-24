@@ -1,0 +1,27 @@
+relationship PersonRequests_People
+	fromColumn: PersonRequests.Person
+	toColumn: People.Person
+
+relationship PersonRequests_Requests
+	crossFilteringBehavior: bothDirections
+	fromColumn: PersonRequests.'Ticket ID'
+	toColumn: Requests.'Ticket ID'
+
+relationship Requests_DimDate
+	fromColumn: Requests.'Created Date'
+	toColumn: DimDate.Date
+
+relationship FormAnswers_Requests
+	fromColumn: FormAnswers.'Ticket ID'
+	toColumn: Requests.'Ticket ID'
+
+relationship f586dd74-b1e7-4435-83be-b06c882068d1
+	joinOnDateBehavior: datePartOnly
+	fromColumn: People.'First Request'
+	toColumn: LocalDateTable_4660595b-909e-4a40-aa8c-5ff316f42a77.Date
+
+relationship 6412fc26-b99d-4730-a7bb-ad6d880fe84b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: People.'Last Request'
+	toColumn: LocalDateTable_a3387b78-4398-4d56-aab1-a1472eaa283d.Date
+

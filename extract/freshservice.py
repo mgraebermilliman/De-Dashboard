@@ -3,6 +3,7 @@
 import base64
 import json
 import re
+import ssl
 import time
 import urllib.error
 import urllib.parse
@@ -31,6 +32,17 @@ def parse_next_link(link_header: str | None) -> str | None:
     return match.group(1) if match else None
 
 
+def tls_context() -> ssl.SSLContext:
+    """Full certificate and hostname verification, as in Python 3.12.
+
+    Python 3.13's VERIFY_X509_STRICT is cleared because an older Zscaler root (expires 2042) in the
+    Windows store lacks a critical Basic Constraints flag. Approved by Kevin, 2026-11-20 (OVERVIEW.md).
+    """
+    context = ssl.create_default_context()
+    context.verify_flags &= ~ssl.VERIFY_X509_STRICT
+    return context
+
+
 class FreshserviceClient:
     def __init__(self, base_url: str, api_key: str, timeout: int = 30, max_retries: int = 5):
         parts = urllib.parse.urlsplit(base_url)
@@ -42,8 +54,9 @@ class FreshserviceClient:
         self._headers = {"Authorization": f"Basic {token}", "Accept": "application/json"}
         self._timeout = timeout
         self._max_retries = max_retries
-        self._opener = urllib.request.build_opener(_NoRedirect)
+        self._opener = urllib.request.build_opener(_NoRedirect, urllib.request.HTTPSHandler(context=tls_context()))
         self.last_headers: dict[str, str] = {}
+        self.request_count = 0
 
     def _url(self, path: str, params: dict | None) -> str:
         url = f"{self._base}/api/v2/{path.lstrip('/')}"
@@ -59,6 +72,7 @@ class FreshserviceClient:
         self._check_host(url)
         for attempt in range(self._max_retries + 1):
             req = urllib.request.Request(url, headers=self._headers, method="GET")
+            self.request_count += 1
             try:
                 with self._opener.open(req, timeout=self._timeout) as resp:
                     self.last_headers = dict(resp.headers.items())

@@ -1,0 +1,66 @@
+{
+  "name": "De-Millimanize Dashboard (Freshservice style)",
+  "dataColors": [
+    "#2EB67D",
+    "#E5484D",
+    "#F5A623",
+    "#7B61FF",
+    "#12344D",
+    "#00C1A0",
+    "#2D7FF9",
+    "#5AC8FA",
+    "#0B6E99",
+    "#8A96A3"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#12344D",
+  "tableAccent": "#00C1A0",
+  "good": "#2EB67D",
+  "neutral": "#F5A623",
+  "bad": "#E5484D",
+  "maximum": "#E5484D",
+  "center": "#F5A623",
+  "minimum": "#F5F7F9",
+  "null": "#C9D1D9",
+  "textClasses": {
+    "callout": { "fontFace": "Segoe UI Semibold", "fontSize": 28, "color": "#12344D" },
+    "title": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#12344D" },
+    "header": { "fontFace": "Segoe UI Semibold", "fontSize": 12, "color": "#12344D" },
+    "label": { "fontFace": "Segoe UI", "fontSize": 10, "color": "#3C4B5C" }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#FFFFFF" } }, "transparency": 0 }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#E3E8EE" } }, "radius": 10 }],
+        "dropShadow": [{ "show": false }],
+        "title": [{ "show": true, "fontFamily": "Segoe UI Semibold", "fontSize": 12, "fontColor": { "solid": { "color": "#12344D" } } }],
+        "categoryAxis": [{ "gridlineShow": false }],
+        "valueAxis": [{ "gridlineShow": false }]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#F5F7F9" } }, "transparency": 0 }],
+        "outspace": [{ "color": { "solid": { "color": "#F5F7F9" } }, "transparency": 0 }]
+      }
+    },
+    "slicer": {
+      "*": {
+        "items": [{ "fontFamily": "Segoe UI", "textSize": 11, "fontColor": { "solid": { "color": "#12344D" } } }]
+      }
+    },
+    "tableEx": {
+      "*": {
+        "columnHeaders": [{ "fontFamily": "Segoe UI Semibold", "backColor": { "solid": { "color": "#12344D" } }, "fontColor": { "solid": { "color": "#FFFFFF" } } }],
+        "grid": [{ "gridHorizontal": true, "gridHorizontalColor": { "solid": { "color": "#E3E8EE" } }, "gridVertical": false }]
+      }
+    },
+    "actionButton": {
+      "*": {
+        "fill": [{ "show": true, "fillColor": { "solid": { "color": "#00C1A0" } } }],
+        "text": [{ "show": true, "fontColor": { "solid": { "color": "#FFFFFF" } }, "fontFamily": "Segoe UI Semibold" }]
+      }
+    }
+  }
+}

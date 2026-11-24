@@ -1,0 +1,101 @@
+table RunLog
+	lineageTag: 0a61e67f-7b17-432f-8acc-6d4f1e5ffaeb
+
+	column Run
+		dataType: int64
+		formatString: 0
+		lineageTag: baad546c-52a4-4331-bf3e-b7b69b1d36ae
+		summarizeBy: none
+		sourceColumn: Run
+
+	column 'Started (UTC)'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		lineageTag: 4779db95-4cd0-4f0f-9ddd-a6b6876e6e7a
+		summarizeBy: none
+		sourceColumn: Started (UTC)
+
+	column 'Finished (UTC)'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		lineageTag: 8b300d75-d915-4947-8917-ca2129acb0b0
+		summarizeBy: none
+		sourceColumn: Finished (UTC)
+
+	column Mode
+		dataType: string
+		lineageTag: 4d720099-2adc-470c-880b-f2f5bdaf5f8b
+		summarizeBy: none
+		sourceColumn: Mode
+
+	column Status
+		dataType: string
+		lineageTag: 745ec9ae-0090-4504-abe0-fd8988266860
+		summarizeBy: none
+		sourceColumn: Status
+
+	column 'Tickets Listed'
+		dataType: int64
+		formatString: 0
+		lineageTag: 1886248f-87a9-4fe6-af72-c93932c4d1f7
+		summarizeBy: sum
+		sourceColumn: Tickets Listed
+
+	column 'Forms Checked'
+		dataType: int64
+		formatString: 0
+		lineageTag: a71ceffb-6bba-4b0c-bd0f-342dd878fe44
+		summarizeBy: sum
+		sourceColumn: Forms Checked
+
+	column 'Matched Total'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9d20ff40-7130-4992-a59b-801c98a4b907
+		summarizeBy: sum
+		sourceColumn: Matched Total
+
+	column 'API Calls'
+		dataType: int64
+		formatString: 0
+		lineageTag: 83e3318c-60b6-4720-a013-5c0e79436910
+		summarizeBy: sum
+		sourceColumn: API Calls
+
+	column Message
+		dataType: string
+		lineageTag: fccc2bb7-19ed-45e4-803e-26251204f411
+		summarizeBy: none
+		sourceColumn: Message
+
+	column 'Finished (Local)'
+		dataType: dateTime
+		formatString: mmm d, yyyy h:mm AM/PM
+		lineageTag: 95f14b95-9446-4faf-b077-63f64b483397
+		summarizeBy: none
+		sourceColumn: Finished (Local)
+
+	partition RunLog = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="RunLog", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Run", Int64.Type},
+										{"Started (UTC)", type datetime},
+										{"Finished (UTC)", type datetime},
+										{"Mode", type text},
+										{"Status", type text},
+										{"Tickets Listed", Int64.Type},
+										{"Forms Checked", Int64.Type},
+										{"Matched Total", Int64.Type},
+										{"API Calls", Int64.Type},
+										{"Message", type text},
+										{"Finished (Local)", type datetime}
+					}),
+					Rows = Table.SelectRows(Typed, each [Run] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

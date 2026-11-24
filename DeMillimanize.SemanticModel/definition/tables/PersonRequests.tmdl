@@ -1,0 +1,40 @@
+table PersonRequests
+	lineageTag: 98289433-62db-425e-8dc4-337b0aa146bf
+
+	column Person
+		dataType: string
+		isHidden
+		lineageTag: 564d5fbd-b0fe-4cad-880c-ea9991ff4265
+		summarizeBy: none
+		sourceColumn: Person
+
+	column Role
+		dataType: string
+		lineageTag: 9897b1e7-07da-4363-be61-853043682fdb
+		summarizeBy: none
+		sourceColumn: Role
+
+	column 'Ticket ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 125d14b7-2e31-4460-b39d-1db556af6f61
+		summarizeBy: none
+		sourceColumn: Ticket ID
+
+	partition PersonRequests = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="PersonRequests", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Person", type text},
+										{"Role", type text},
+										{"Ticket ID", Int64.Type}
+					}),
+					Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

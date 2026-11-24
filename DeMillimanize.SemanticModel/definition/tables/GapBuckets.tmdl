@@ -1,0 +1,49 @@
+table GapBuckets
+	lineageTag: 45142a6f-61df-4417-9915-af8194b7b883
+
+	column Bucket
+		dataType: string
+		lineageTag: b00895f3-2bc9-4240-bcce-f96704e5faf2
+		summarizeBy: none
+		sourceColumn: Bucket
+		sortByColumn: 'Bucket Order'
+
+	column 'Min Days'
+		dataType: int64
+		isHidden
+		lineageTag: 09defaa1-bfa1-4b31-adbf-c47d8b367101
+		summarizeBy: none
+		sourceColumn: Min Days
+
+	column 'Max Days'
+		dataType: int64
+		isHidden
+		lineageTag: 7befd6db-bf6e-4ca4-b455-bd2d06581d28
+		summarizeBy: none
+		sourceColumn: Max Days
+
+	column 'Bucket Order'
+		dataType: int64
+		isHidden
+		lineageTag: 3c859c5b-4f3c-4f55-8c8d-0b389cce2f22
+		summarizeBy: none
+		sourceColumn: Bucket Order
+
+	column 'Within 120 Days'
+		dataType: string
+		lineageTag: 7cb3bafe-e567-41f7-9587-9d96696cab6b
+		summarizeBy: none
+		sourceColumn: Within 120 Days
+
+	partition GapBuckets = m
+		mode: import
+		source =
+				#table(
+					type table [Bucket = text, #"Min Days" = Int64.Type, #"Max Days" = Int64.Type,
+						#"Bucket Order" = Int64.Type, #"Within 120 Days" = text],
+					{{"0-30", 0, 30, 1, "Yes"}, {"31-60", 31, 60, 2, "Yes"}, {"61-90", 61, 90, 3, "Yes"},
+						{"91-120", 91, 120, 4, "Yes"}, {"121-180", 121, 180, 5, "No"}, {"181-365", 181, 365, 6, "No"},
+						{"365+", 366, 1000000, 7, "No"}})
+
+	annotation PBI_ResultType = Table
+

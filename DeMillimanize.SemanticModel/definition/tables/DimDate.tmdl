@@ -1,0 +1,120 @@
+table DimDate
+	lineageTag: c96fb28f-3835-4171-909f-77cd440afbe7
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: mmm d, yyyy
+		lineageTag: fc46f6de-621b-4fa7-af33-17bbe891ff2a
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 04977580-f8c2-4274-88a8-04970fb3cb26
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Quarter
+		dataType: string
+		lineageTag: a7013d33-8ef1-458f-bceb-6693aafe8a6b
+		summarizeBy: none
+		sourceColumn: Quarter
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: c19a1167-4c81-4b4e-a355-446946a65dbb
+		summarizeBy: none
+		sourceColumn: Month Number
+
+	column Month
+		dataType: string
+		lineageTag: f8fb750a-c8e0-4971-a973-d93d2a15c156
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Month Number'
+
+	column 'Month Start'
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 8b6ee6f5-8b6c-4d5a-b854-9af67b72730e
+		summarizeBy: none
+		sourceColumn: Month Start
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Month Year'
+		dataType: string
+		lineageTag: 7c19018c-5104-40ed-a70b-62c4e5086aef
+		summarizeBy: none
+		sourceColumn: Month Year
+		sortByColumn: 'Month Start'
+
+	column Week
+		dataType: int64
+		formatString: 0
+		lineageTag: 3d8ba733-9caf-4e63-9881-535b062cd7a9
+		summarizeBy: none
+		sourceColumn: Week
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: ac3a624d-9a6e-489b-82e7-20eee6b9951e
+		summarizeBy: none
+		sourceColumn: Day of Week
+		sortByColumn: 'Day of Week Number'
+
+	column 'Day of Week Number'
+		dataType: int64
+		formatString: 0
+		lineageTag: ec2eeba8-af6e-42b6-91d4-5f9c248d5958
+		summarizeBy: none
+		sourceColumn: Day of Week Number
+
+	column 'Holiday Season'
+		dataType: string
+		lineageTag: 3700ef14-ef01-4336-8dfc-f9a5ec5eb134
+		summarizeBy: none
+		sourceColumn: Holiday Season
+
+	column 'Holiday Month'
+		dataType: string
+		lineageTag: d2513640-22ba-4348-9dc9-0ef7a42b78b7
+		summarizeBy: none
+		sourceColumn: Holiday Month
+
+	partition DimDate = m
+		mode: import
+		source =
+				let
+					Created = List.RemoveNulls(Requests[Created Date]),
+					Today = Date.From(DateTime.LocalNow()),
+					StartDate = #date(Date.Year(if List.IsEmpty(Created) then Today else List.Min(Created)), 1, 1),
+					EndDate = #date(Date.Year(List.Max(Created & {Today})), 12, 31),
+					Days = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+					Base = Table.FromList(Days, Splitter.SplitByNothing(), type table [Date = date]),
+					Year = Table.AddColumn(Base, "Year", each Date.Year([Date]), Int64.Type),
+					Quarter = Table.AddColumn(Year, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+					MonthNumber = Table.AddColumn(Quarter, "Month Number", each Date.Month([Date]), Int64.Type),
+					Month = Table.AddColumn(MonthNumber, "Month", each Date.ToText([Date], "MMM", "en-US"), type text),
+					MonthStart = Table.AddColumn(Month, "Month Start", each Date.StartOfMonth([Date]), type date),
+					MonthYear = Table.AddColumn(MonthStart, "Month Year", each Date.ToText([Date], "MMM yyyy", "en-US"), type text),
+					Week = Table.AddColumn(MonthYear, "Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+					DayName = Table.AddColumn(Week, "Day of Week", each Date.ToText([Date], "ddd", "en-US"), type text),
+					DayNumber = Table.AddColumn(DayName, "Day of Week Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
+					// Same rule as the extract: Nov 15 through Jan 5.
+					Holiday = Table.AddColumn(DayNumber, "Holiday Season", each
+						if (Date.Month([Date]) = 11 and Date.Day([Date]) >= 15) or Date.Month([Date]) = 12
+							or (Date.Month([Date]) = 1 and Date.Day([Date]) <= 5) then "Yes" else "No", type text),
+					HolidayMonth = Table.AddColumn(Holiday, "Holiday Month", each
+						if List.Contains({11, 12, 1}, Date.Month([Date])) then "Yes" else "No", type text)
+				in
+					HolidayMonth
+
+	annotation PBI_ResultType = Table
+

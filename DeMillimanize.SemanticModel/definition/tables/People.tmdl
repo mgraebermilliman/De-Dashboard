@@ -1,0 +1,147 @@
+table People
+	lineageTag: 189f4bf2-1868-4f76-be11-95901b915e7e
+
+	column Person
+		dataType: string
+		lineageTag: 8835ac81-2659-4499-988a-d4494f62394f
+		summarizeBy: none
+		sourceColumn: Person
+
+	column Email
+		dataType: string
+		lineageTag: c225ad65-1c58-4a3f-b845-482658761ab2
+		summarizeBy: none
+		sourceColumn: Email
+
+	column Department
+		dataType: string
+		lineageTag: 99619d8e-54ea-4d4a-aa0c-2212d717a0c2
+		summarizeBy: none
+		sourceColumn: Department
+
+	column Frequent
+		dataType: string
+		lineageTag: 4fd16174-f4f8-4fb9-ae2d-4911e2fd4dda
+		summarizeBy: none
+		sourceColumn: Frequent
+
+	column 'Requests Made'
+		dataType: int64
+		formatString: 0
+		lineageTag: 8158326f-1198-454b-b880-78bd92554e29
+		summarizeBy: sum
+		sourceColumn: Requests Made
+
+	column 'Requests Made For Others'
+		dataType: int64
+		formatString: 0
+		lineageTag: da6a3d73-9515-430b-b846-3304b7996218
+		summarizeBy: sum
+		sourceColumn: Requests Made For Others
+
+	column 'Times Named As Recipient'
+		dataType: int64
+		formatString: 0
+		lineageTag: a7dcb504-c366-41d3-aadd-41dcc1742b32
+		summarizeBy: sum
+		sourceColumn: Times Named As Recipient
+
+	column Approved
+		dataType: int64
+		formatString: 0
+		lineageTag: e9fc6b5b-ee25-4cf7-822e-d69a629dafa0
+		summarizeBy: sum
+		sourceColumn: Approved
+
+	column Denied
+		dataType: int64
+		formatString: 0
+		lineageTag: dc62dab7-7de0-42c3-8b09-43cd6527077d
+		summarizeBy: sum
+		sourceColumn: Denied
+
+	column Pending
+		dataType: int64
+		formatString: 0
+		lineageTag: a3ce17a6-ab4a-4757-91e0-24d279690973
+		summarizeBy: sum
+		sourceColumn: Pending
+
+	column 'Needs Review'
+		dataType: int64
+		formatString: 0
+		lineageTag: ec98c7e9-c715-4fb1-909c-95d0d6a27a08
+		summarizeBy: sum
+		sourceColumn: Needs Review
+
+	column 'First Request'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		lineageTag: fe322402-5753-49ad-9741-65daf7d40cf4
+		summarizeBy: none
+		sourceColumn: First Request
+
+		variation Variation
+			isDefault
+			relationship: f586dd74-b1e7-4435-83be-b06c882068d1
+			defaultHierarchy: LocalDateTable_4660595b-909e-4a40-aa8c-5ff316f42a77.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Last Request'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		lineageTag: 34b2d2c6-623a-40a3-a62e-cc73f739bc7e
+		summarizeBy: none
+		sourceColumn: Last Request
+
+		variation Variation
+			isDefault
+			relationship: 6412fc26-b99d-4730-a7bb-ad6d880fe84b
+			defaultHierarchy: LocalDateTable_a3387b78-4398-4d56-aab1-a1472eaa283d.'Date Hierarchy'
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Shortest Gap (Days)'
+		dataType: int64
+		formatString: 0
+		lineageTag: 40470840-c84f-4aea-a3e8-41525afee968
+		summarizeBy: sum
+		sourceColumn: Shortest Gap (Days)
+
+		annotation SummarizationSetBy = Automatic
+
+	column Technician
+		dataType: string
+		lineageTag: 5c611d8f-7ec3-45bb-b020-e92030e6a129
+		summarizeBy: none
+		sourceColumn: Technician
+
+	partition People = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="People", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Person", type text},
+										{"Email", type text},
+										{"Department", type text},
+										{"Frequent", type text},
+										{"Requests Made", Int64.Type},
+										{"Requests Made For Others", Int64.Type},
+										{"Times Named As Recipient", Int64.Type},
+										{"Approved", Int64.Type},
+										{"Denied", Int64.Type},
+										{"Pending", Int64.Type},
+										{"Needs Review", Int64.Type},
+										{"First Request", type date},
+										{"Last Request", type date},
+										{"Shortest Gap (Days)", Int64.Type},
+										{"Technician", type text}
+					}),
+					Rows = Table.SelectRows(Typed, each [Person] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,39 @@
+table FormAnswers
+	lineageTag: 02ee19e6-543e-4456-90db-851c11f95b1e
+
+	column 'Ticket ID'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8772a159-687c-4709-8e2a-3e28716e7b20
+		summarizeBy: none
+		sourceColumn: Ticket ID
+
+	column Field
+		dataType: string
+		lineageTag: 0f6bddc1-1648-4c14-9279-5ec888b4b851
+		summarizeBy: none
+		sourceColumn: Field
+
+	column Value
+		dataType: string
+		lineageTag: ce7f733f-2171-42cd-b199-6dd2123fcd36
+		summarizeBy: none
+		sourceColumn: Value
+
+	partition FormAnswers = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="FormAnswers", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Ticket ID", Int64.Type},
+										{"Field", type text},
+										{"Value", type text}
+					}),
+					Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,379 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "72e46a827c7ff4d6fd0a",
+  "position": {
+    "x": 801.66666666666674,
+    "y": 28.333333333333336,
+    "z": 2,
+    "height": 516.66666666666674,
+    "width": 491.66666666666669,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "People"
+                        }
+                      },
+                      "Property": "Times Named As Recipient"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(People.Times Named As Recipient)",
+              "nativeQueryRef": "Sum of Times Named As Recipient"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "People"
+                        }
+                      },
+                      "Property": "Requests Made"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(People.Requests Made)",
+              "nativeQueryRef": "Sum of Requests Made"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "People"
+                        }
+                      },
+                      "Property": "Approved"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(People.Approved)",
+              "nativeQueryRef": "Sum of Approved"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "People"
+                        }
+                      },
+                      "Property": "Denied"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(People.Denied)",
+              "nativeQueryRef": "Sum of Denied"
+            },
+            {
+              "field": {
+                "Aggregation": {
+                  "Expression": {
+                    "Column": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "People"
+                        }
+                      },
+                      "Property": "Shortest Gap (Days)"
+                    }
+                  },
+                  "Function": 0
+                }
+              },
+              "queryRef": "Sum(People.Shortest Gap (Days))",
+              "nativeQueryRef": "Sum of Shortest Gap (Days)"
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Person"
+                }
+              },
+              "queryRef": "People.Person",
+              "nativeQueryRef": "Person"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Department"
+                }
+              },
+              "queryRef": "People.Department",
+              "nativeQueryRef": "Department"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Technician"
+                }
+              },
+              "queryRef": "People.Technician",
+              "nativeQueryRef": "Technician"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "People"
+                    }
+                  },
+                  "Property": "Frequent"
+                }
+              },
+              "queryRef": "People.Frequent",
+              "nativeQueryRef": "Frequent"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "First Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Year"
+                }
+              },
+              "queryRef": "People.First Request.Variation.Date Hierarchy.Year",
+              "nativeQueryRef": "First Request Year"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "First Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Quarter"
+                }
+              },
+              "queryRef": "People.First Request.Variation.Date Hierarchy.Quarter",
+              "nativeQueryRef": "First Request Quarter"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "First Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Month"
+                }
+              },
+              "queryRef": "People.First Request.Variation.Date Hierarchy.Month",
+              "nativeQueryRef": "First Request Month"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "First Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Day"
+                }
+              },
+              "queryRef": "People.First Request.Variation.Date Hierarchy.Day",
+              "nativeQueryRef": "First Request Day"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "Last Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Year"
+                }
+              },
+              "queryRef": "People.Last Request.Variation.Date Hierarchy.Year",
+              "nativeQueryRef": "Last Request Year"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "Last Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Quarter"
+                }
+              },
+              "queryRef": "People.Last Request.Variation.Date Hierarchy.Quarter",
+              "nativeQueryRef": "Last Request Quarter"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "Last Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Month"
+                }
+              },
+              "queryRef": "People.Last Request.Variation.Date Hierarchy.Month",
+              "nativeQueryRef": "Last Request Month"
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "PropertyVariationSource": {
+                          "Expression": {
+                            "SourceRef": {
+                              "Entity": "People"
+                            }
+                          },
+                          "Name": "Variation",
+                          "Property": "Last Request"
+                        }
+                      },
+                      "Hierarchy": "Date Hierarchy"
+                    }
+                  },
+                  "Level": "Day"
+                }
+              },
+              "queryRef": "People.Last Request.Variation.Date Hierarchy.Day",
+              "nativeQueryRef": "Last Request Day"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

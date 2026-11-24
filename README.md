@@ -50,11 +50,17 @@ The dashboard lets the program owner type in a name and see right away:
 
 ## Technology
 
-**Power BI**, saved as a Power BI Project (`.pbip`) so the report can be tracked in git.
+**Power BI**, built on an Excel workbook that a Python extract rewrites twice a day. The Power BI design follows Michael's specification, merged with this project's rules.
 
-- Data is pulled from the Freshservice API (read-only) by a small Python extract script. The script finds and classifies the tickets and looks up each person's practice in Active Directory. Power BI reads the script's output file.
-- The extract runs twice daily on a schedule. In Power BI Desktop, **Refresh** reloads the latest file, and a "Run extract now" shortcut updates the file on demand.
-- The report is shared through the Power BI Service, so Microsoft sign-in controls who can open it.
+- The **extract** (`python run.py extract`) reads Freshservice (read-only, as the ADM account). It finds the De-Millimanize tickets, decides each outcome, flags frequent requesters, and writes `DeMillimanize Requests.xlsx` with 5 tables: Requests, People, PersonRequests, FormAnswers and RunLog.
+- **Power BI** only reads that workbook. It never calls Freshservice and never needs an API key.
+- The report has 4 pages:
+  - **Request Lookup:** type a name, then see their history and the frequent flag.
+  - **Overview**
+  - **Frequent and Patterns**
+  - **Ticket Detail and Data Quality**
+- In Power BI Desktop, **Refresh** reloads the workbook. `tools\run-extract.cmd` updates the workbook on demand.
+- The report is shared through the Power BI Service, so Microsoft sign-in controls who can open it. A *Program Owners* RLS role is included.
 - Certificates of Destruction stay on the Freshservice ticket. The dashboard links to the ticket.
 
 The reasons for this choice are recorded in [OVERVIEW.md](OVERVIEW.md).
@@ -66,11 +72,14 @@ The reasons for this choice are recorded in [OVERVIEW.md](OVERVIEW.md).
 | [README.md](README.md) | What this project is and why it exists (this file) |
 | [OVERVIEW.md](OVERVIEW.md) | Current state of the project, updated with **every** change |
 | [AGENTS.md](AGENTS.md) | Rules that AI coding agents (and humans) must follow in this repo |
-| `extract/` | Python extract script (standard library only) |
+| `extract/` | Python extract: API client, matching and outcome rules, workbook writer |
+| `powerbi/` | Power BI model script (TMDL), theme and [build guide](powerbi/GUIDE.md) |
+| `sample_data/` | **Fake** data generator for building the report without real data |
 | `tests/` | Unit tests. They use fake data only. |
-| `tools/` | Double-click launchers (for example `probe.cmd`) |
+| `tools/` | Double-click launchers: `probe.cmd`, `run-extract.cmd`, `schedule-extract.cmd` |
 | `run.py` | Entry point used by the launchers. It works from a UNC path. |
-| `data/` | Extracted data. **Git-ignored. Contains real employee data.** |
+| `requirements.txt` | The one dependency (openpyxl), already installed machine-wide |
+| `data/` | The real workbook, run state and the outcome override file. **Git-ignored. Contains real employee data.** |
 
 ## Getting started
 
@@ -88,3 +97,20 @@ python -m unittest discover -s tests -t .
 2. When asked, type the **ADM account password**. A second window opens and runs the probe as the ADM account.
 3. When asked, enter one form ticket number and one older or archived ticket number, digits only.
 4. The report is saved to `data\probe_report.json`.
+
+**Run the extract:** double-click `tools\run-extract.cmd` in File Explorer and enter the ADM password. It writes `data\DeMillimanize Requests.xlsx`.
+
+- The first run is a full run.
+- Later runs only fetch changed tickets. To force a full run: `python run.py extract --full`.
+
+**Schedule it** (twice daily, as the ADM account): double-click `tools\schedule-extract.cmd`. Confirm with IT policy first (see OVERVIEW.md, open questions).
+
+**Correct an outcome by hand:** add a row to `data\outcome_overrides.csv`:
+
+- Columns: `Ticket ID, Outcome, Reason, Reviewed By, Reviewed On`
+- `Outcome` must be Approved, Denied, Pending or Needs Review.
+- `Reviewed On` must be in `YYYY-MM-DD` format.
+
+The next run applies it, with Outcome Source "Manual Override".
+
+**Build the Power BI report:** follow [powerbi/GUIDE.md](powerbi/GUIDE.md). Start with fake data from `python run.py mock`. After changing the workbook columns, regenerate the model script with `python run.py tmdl`. To regenerate the 4 report pages, close Power BI Desktop and run `python run.py pages`.

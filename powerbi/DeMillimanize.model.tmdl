@@ -1,0 +1,936 @@
+createOrReplace
+
+	expression WorkbookPath = "O:\De-Dashboard\sample_data\DeMillimanize Requests.mock.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+
+	expression Workbook =
+			let
+				// WorkbookPath can be a local/UNC file path or a SharePoint file URL (https://...).
+				Source = if Text.StartsWith(WorkbookPath, "http", Comparer.OrdinalIgnoreCase)
+					then Web.Contents(WorkbookPath)
+					else File.Contents(WorkbookPath),
+				Book = Excel.Workbook(Source, null, true)
+			in
+				Book
+
+	table Requests
+
+		column 'Ticket ID'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Ticket ID
+			displayFolder: Ticket
+
+		column 'Ticket URL'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Ticket URL
+			dataCategory: WebUrl
+			displayFolder: Ticket
+
+		column 'Created Date'
+			dataType: dateTime
+			formatString: mmm d, yyyy
+			summarizeBy: none
+			sourceColumn: Created Date
+			displayFolder: Ticket
+
+		column 'Requester Name'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Requester Name
+			displayFolder: People
+
+		column 'Requester Email'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Requester Email
+			displayFolder: People
+
+		column Department
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Department
+			displayFolder: People
+
+		column 'Computer Provided To'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Computer Provided To
+			displayFolder: People
+
+		column 'Recipient Differs From Requester'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Recipient Differs From Requester
+			displayFolder: People
+
+		column 'Requested For'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Requested For
+			displayFolder: People
+
+		column Outcome
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Outcome
+			displayFolder: Outcome
+
+		column 'Outcome Source'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Outcome Source
+			displayFolder: Outcome
+
+		column 'Outcome Evidence'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Outcome Evidence
+			displayFolder: Outcome
+
+		column Approver
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Approver
+			displayFolder: Outcome
+
+		column 'Decision Date'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Decision Date
+			displayFolder: Outcome
+
+		column 'Device Type'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Device Type
+			displayFolder: Device
+
+		column 'PC Make and Model'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: PC Make and Model
+			displayFolder: Device
+
+		column 'PC Serial Number'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: PC Serial Number
+			displayFolder: Device
+
+		column 'Most Recent PC Name'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Most Recent PC Name
+			displayFolder: Device
+
+		column 'Frequent (Requester)'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Frequent (Requester)
+			displayFolder: Frequency
+
+		column 'Requester Request #'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Requester Request #
+			displayFolder: Frequency
+
+		column 'Days Since Previous (Requester)'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Days Since Previous (Requester)
+			displayFolder: Frequency
+
+		column 'Frequent (Recipient)'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Frequent (Recipient)
+			displayFolder: Frequency
+
+		column 'Recipient Request #'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Recipient Request #
+			displayFolder: Frequency
+
+		column 'Days Since Previous (Recipient)'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Days Since Previous (Recipient)
+			displayFolder: Frequency
+
+		column 'Same Serial Seen Before'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Same Serial Seen Before
+			displayFolder: Frequency
+
+		column 'Holiday Season'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Holiday Season
+			displayFolder: Frequency
+
+		column 'Certificate Attached'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Certificate Attached
+			displayFolder: Device
+
+		column 'Certificate File'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Certificate File
+			displayFolder: Device
+
+		column 'Certificate Missing'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Certificate Missing
+			displayFolder: Device
+
+		column 'Match Source'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Match Source
+			displayFolder: Matching
+
+		column 'Matched Phrase'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Matched Phrase
+			displayFolder: Matching
+
+		column 'Matched Field'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Matched Field
+			displayFolder: Matching
+
+		column 'Match Needs Review'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Match Needs Review
+			displayFolder: Matching
+
+		column 'Ticket Type'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Ticket Type
+			displayFolder: Ticket
+
+		column Status
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Status
+			displayFolder: Ticket
+
+		column 'Item Stage'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Item Stage
+			displayFolder: Ticket
+
+		column 'Closed Date'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Closed Date
+			displayFolder: Ticket
+
+		column Subject
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Subject
+			displayFolder: Ticket
+
+		column 'Resolution Note'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Resolution Note
+			displayFolder: Ticket
+
+		column 'Last Updated'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Last Updated
+			displayFolder: Ticket
+
+		column 'Requester Is Technician'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Requester Is Technician
+			displayFolder: People
+
+		column 'Recipient Is Technician'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Recipient Is Technician
+			displayFolder: People
+
+		partition Requests = m
+			mode: import
+			source =
+					let
+						Source = Workbook{[Item="Requests", Kind="Table"]}[Data],
+						Typed = Table.TransformColumnTypes(Source, {
+											{"Ticket ID", Int64.Type},
+											{"Ticket URL", type text},
+											{"Created Date", type date},
+											{"Requester Name", type text},
+											{"Requester Email", type text},
+											{"Department", type text},
+											{"Computer Provided To", type text},
+											{"Recipient Differs From Requester", type text},
+											{"Requested For", type text},
+											{"Outcome", type text},
+											{"Outcome Source", type text},
+											{"Outcome Evidence", type text},
+											{"Approver", type text},
+											{"Decision Date", type datetime},
+											{"Device Type", type text},
+											{"PC Make and Model", type text},
+											{"PC Serial Number", type text},
+											{"Most Recent PC Name", type text},
+											{"Frequent (Requester)", type text},
+											{"Requester Request #", Int64.Type},
+											{"Days Since Previous (Requester)", Int64.Type},
+											{"Frequent (Recipient)", type text},
+											{"Recipient Request #", Int64.Type},
+											{"Days Since Previous (Recipient)", Int64.Type},
+											{"Same Serial Seen Before", type text},
+											{"Holiday Season", type text},
+											{"Certificate Attached", type text},
+											{"Certificate File", type text},
+											{"Certificate Missing", type text},
+											{"Match Source", type text},
+											{"Matched Phrase", type text},
+											{"Matched Field", type text},
+											{"Match Needs Review", type text},
+											{"Ticket Type", type text},
+											{"Status", type text},
+											{"Item Stage", type text},
+											{"Closed Date", type datetime},
+											{"Subject", type text},
+											{"Resolution Note", type text},
+											{"Last Updated", type datetime},
+											{"Requester Is Technician", type text},
+											{"Recipient Is Technician", type text}
+						}),
+						Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+					in
+						Rows
+
+	table People
+
+		column Person
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Person
+
+		column Email
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Email
+
+		column Department
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Department
+
+		column Frequent
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Frequent
+
+		column 'Requests Made'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Requests Made
+
+		column 'Requests Made For Others'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Requests Made For Others
+
+		column 'Times Named As Recipient'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Times Named As Recipient
+
+		column Approved
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Approved
+
+		column Denied
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Denied
+
+		column Pending
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Pending
+
+		column 'Needs Review'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Needs Review
+
+		column 'First Request'
+			dataType: dateTime
+			formatString: mmm d, yyyy
+			summarizeBy: none
+			sourceColumn: First Request
+
+		column 'Last Request'
+			dataType: dateTime
+			formatString: mmm d, yyyy
+			summarizeBy: none
+			sourceColumn: Last Request
+
+		column 'Shortest Gap (Days)'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Shortest Gap (Days)
+
+		column Technician
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Technician
+
+		partition People = m
+			mode: import
+			source =
+					let
+						Source = Workbook{[Item="People", Kind="Table"]}[Data],
+						Typed = Table.TransformColumnTypes(Source, {
+											{"Person", type text},
+											{"Email", type text},
+											{"Department", type text},
+											{"Frequent", type text},
+											{"Requests Made", Int64.Type},
+											{"Requests Made For Others", Int64.Type},
+											{"Times Named As Recipient", Int64.Type},
+											{"Approved", Int64.Type},
+											{"Denied", Int64.Type},
+											{"Pending", Int64.Type},
+											{"Needs Review", Int64.Type},
+											{"First Request", type date},
+											{"Last Request", type date},
+											{"Shortest Gap (Days)", Int64.Type},
+											{"Technician", type text}
+						}),
+						Rows = Table.SelectRows(Typed, each [Person] <> null)
+					in
+						Rows
+
+	table PersonRequests
+
+		column Person
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Person
+			isHidden
+
+		column Role
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Role
+
+		column 'Ticket ID'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Ticket ID
+			isHidden
+
+		partition PersonRequests = m
+			mode: import
+			source =
+					let
+						Source = Workbook{[Item="PersonRequests", Kind="Table"]}[Data],
+						Typed = Table.TransformColumnTypes(Source, {
+											{"Person", type text},
+											{"Role", type text},
+											{"Ticket ID", Int64.Type}
+						}),
+						Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+					in
+						Rows
+
+	table FormAnswers
+
+		column 'Ticket ID'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Ticket ID
+			isHidden
+
+		column Field
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Field
+
+		column Value
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Value
+
+		partition FormAnswers = m
+			mode: import
+			source =
+					let
+						Source = Workbook{[Item="FormAnswers", Kind="Table"]}[Data],
+						Typed = Table.TransformColumnTypes(Source, {
+											{"Ticket ID", Int64.Type},
+											{"Field", type text},
+											{"Value", type text}
+						}),
+						Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+					in
+						Rows
+
+	table RunLog
+
+		column Run
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Run
+
+		column 'Started (UTC)'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Started (UTC)
+
+		column 'Finished (UTC)'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Finished (UTC)
+
+		column Mode
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Mode
+
+		column Status
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Status
+
+		column 'Tickets Listed'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Tickets Listed
+
+		column 'Forms Checked'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Forms Checked
+
+		column 'Matched Total'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: Matched Total
+
+		column 'API Calls'
+			dataType: int64
+			formatString: 0
+			summarizeBy: sum
+			sourceColumn: API Calls
+
+		column Message
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Message
+
+		column 'Finished (Local)'
+			dataType: dateTime
+			formatString: mmm d, yyyy h:mm AM/PM
+			summarizeBy: none
+			sourceColumn: Finished (Local)
+
+		partition RunLog = m
+			mode: import
+			source =
+					let
+						Source = Workbook{[Item="RunLog", Kind="Table"]}[Data],
+						Typed = Table.TransformColumnTypes(Source, {
+											{"Run", Int64.Type},
+											{"Started (UTC)", type datetime},
+											{"Finished (UTC)", type datetime},
+											{"Mode", type text},
+											{"Status", type text},
+											{"Tickets Listed", Int64.Type},
+											{"Forms Checked", Int64.Type},
+											{"Matched Total", Int64.Type},
+											{"API Calls", Int64.Type},
+											{"Message", type text},
+											{"Finished (Local)", type datetime}
+						}),
+						Rows = Table.SelectRows(Typed, each [Run] <> null)
+					in
+						Rows
+
+	table DimDate
+		dataCategory: Time
+
+		column Date
+			dataType: dateTime
+			formatString: mmm d, yyyy
+			summarizeBy: none
+			sourceColumn: Date
+			isKey
+
+		column Year
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Year
+
+		column Quarter
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Quarter
+
+		column 'Month Number'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Month Number
+
+		column Month
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Month
+			sortByColumn: 'Month Number'
+
+		column 'Month Start'
+			dataType: dateTime
+			formatString: mmm yyyy
+			summarizeBy: none
+			sourceColumn: Month Start
+
+		column 'Month Year'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Month Year
+			sortByColumn: 'Month Start'
+
+		column Week
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Week
+
+		column 'Day of Week'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Day of Week
+			sortByColumn: 'Day of Week Number'
+
+		column 'Day of Week Number'
+			dataType: int64
+			formatString: 0
+			summarizeBy: none
+			sourceColumn: Day of Week Number
+
+		column 'Holiday Season'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Holiday Season
+
+		column 'Holiday Month'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Holiday Month
+
+		partition DimDate = m
+			mode: import
+			source =
+					let
+						Created = List.RemoveNulls(Requests[Created Date]),
+						Today = Date.From(DateTime.LocalNow()),
+						StartDate = #date(Date.Year(if List.IsEmpty(Created) then Today else List.Min(Created)), 1, 1),
+						EndDate = #date(Date.Year(List.Max(Created & {Today})), 12, 31),
+						Days = List.Dates(StartDate, Duration.Days(EndDate - StartDate) + 1, #duration(1, 0, 0, 0)),
+						Base = Table.FromList(Days, Splitter.SplitByNothing(), type table [Date = date]),
+						Year = Table.AddColumn(Base, "Year", each Date.Year([Date]), Int64.Type),
+						Quarter = Table.AddColumn(Year, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+						MonthNumber = Table.AddColumn(Quarter, "Month Number", each Date.Month([Date]), Int64.Type),
+						Month = Table.AddColumn(MonthNumber, "Month", each Date.ToText([Date], "MMM", "en-US"), type text),
+						MonthStart = Table.AddColumn(Month, "Month Start", each Date.StartOfMonth([Date]), type date),
+						MonthYear = Table.AddColumn(MonthStart, "Month Year", each Date.ToText([Date], "MMM yyyy", "en-US"), type text),
+						Week = Table.AddColumn(MonthYear, "Week", each Date.WeekOfYear([Date], Day.Monday), Int64.Type),
+						DayName = Table.AddColumn(Week, "Day of Week", each Date.ToText([Date], "ddd", "en-US"), type text),
+						DayNumber = Table.AddColumn(DayName, "Day of Week Number", each Date.DayOfWeek([Date], Day.Monday) + 1, Int64.Type),
+						// Same rule as the extract: Nov 15 through Jan 5.
+						Holiday = Table.AddColumn(DayNumber, "Holiday Season", each
+							if (Date.Month([Date]) = 11 and Date.Day([Date]) >= 15) or Date.Month([Date]) = 12
+								or (Date.Month([Date]) = 1 and Date.Day([Date]) <= 5) then "Yes" else "No", type text),
+						HolidayMonth = Table.AddColumn(Holiday, "Holiday Month", each
+							if List.Contains({11, 12, 1}, Date.Month([Date])) then "Yes" else "No", type text)
+					in
+						HolidayMonth
+
+	table GapBuckets
+
+		column Bucket
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Bucket
+			sortByColumn: 'Bucket Order'
+
+		column 'Min Days'
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: Min Days
+			isHidden
+
+		column 'Max Days'
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: Max Days
+			isHidden
+
+		column 'Bucket Order'
+			dataType: int64
+			summarizeBy: none
+			sourceColumn: Bucket Order
+			isHidden
+
+		column 'Within 120 Days'
+			dataType: string
+			summarizeBy: none
+			sourceColumn: Within 120 Days
+
+		partition GapBuckets = m
+			mode: import
+			source =
+					#table(
+						type table [Bucket = text, #"Min Days" = Int64.Type, #"Max Days" = Int64.Type,
+							#"Bucket Order" = Int64.Type, #"Within 120 Days" = text],
+						{{"0-30", 0, 30, 1, "Yes"}, {"31-60", 31, 60, 2, "Yes"}, {"61-90", 61, 90, 3, "Yes"},
+							{"91-120", 91, 120, 4, "Yes"}, {"121-180", 121, 180, 5, "No"}, {"181-365", 181, 365, 6, "No"},
+							{"365+", 366, 1000000, 7, "No"}})
+
+	table _Measures
+
+		measure 'Total Requests' = COALESCE ( COUNTROWS ( Requests ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure Approved = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Approved" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure Denied = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Denied" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure Pending = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Pending" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Needs Review' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Outcome] = "Needs Review" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Unique Requesters' = COALESCE ( DISTINCTCOUNTNOBLANK ( Requests[Requester Name] ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Frequent Requests' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Frequent (Requester)] = "Yes" || Requests[Frequent (Recipient)] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Frequent People' = COALESCE ( CALCULATE ( DISTINCTCOUNT ( PersonRequests[Person] ), People[Frequent] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Requests Made For Others' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Recipient Differs From Requester] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Duplicate Serials' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Same Serial Seen Before] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Certificates Missing' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Certificate Missing] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Match Needs Review' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Match Needs Review] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Technician-Listed Requests' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Recipient Is Technician] = "Yes" ), 0 )
+			formatString: #,0
+			displayFolder: Counts
+
+		measure 'Approval Rate %' = DIVIDE ( [Approved], [Approved] + [Denied] )
+			formatString: 0.0%
+			displayFolder: Rates
+
+		measure 'Denial Rate %' = DIVIDE ( [Denied], [Approved] + [Denied] )
+			formatString: 0.0%
+			displayFolder: Rates
+
+		measure 'Holiday Season Share %' = DIVIDE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Holiday Season] = "Yes" ), [Total Requests] )
+			formatString: 0.0%
+			displayFolder: Rates
+
+		measure 'Avg Days Between Requests' = AVERAGE ( Requests[Days Since Previous (Requester)] )
+			formatString: 0
+			displayFolder: Timing
+
+		measure 'Avg Days Between Requests (Recipient)' = AVERAGE ( Requests[Days Since Previous (Recipient)] )
+			formatString: 0
+			displayFolder: Timing
+
+		measure 'Avg Days to Decision' = AVERAGEX ( FILTER ( Requests, NOT ISBLANK ( Requests[Decision Date] ) && NOT ISBLANK ( Requests[Created Date] ) ), DATEDIFF ( Requests[Created Date], Requests[Decision Date], DAY ) )
+			formatString: 0.0
+			displayFolder: Timing
+
+		measure 'Requests Same Period Last Year' = CALCULATE ( [Total Requests], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+			formatString: #,0
+			displayFolder: Timing
+
+		measure 'Requests MoM Change' = VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) ) RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), [Total Requests] - Previous )
+			formatString: +#,0;-#,0;0
+			displayFolder: Timing
+
+		measure 'Requests MoM Change %' = VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) ) RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), DIVIDE ( [Total Requests] - Previous, Previous ) )
+			formatString: +0.0%;-0.0%;0.0%
+			displayFolder: Timing
+
+		measure 'Requests YoY Change' = [Total Requests] - [Requests Same Period Last Year]
+			formatString: +#,0;-#,0;0
+			displayFolder: Timing
+
+		measure 'Requests YoY Change %' = DIVIDE ( [Total Requests] - [Requests Same Period Last Year], [Requests Same Period Last Year] )
+			formatString: +0.0%;-0.0%;0.0%
+			displayFolder: Timing
+
+		measure 'Share of Year %' = DIVIDE ( [Total Requests], CALCULATE ( [Total Requests], ALLEXCEPT ( DimDate, DimDate[Year] ) ) )
+			formatString: 0.0%
+			displayFolder: Patterns
+
+		measure 'All-Years Share of Month %' = DIVIDE ( CALCULATE ( [Total Requests], REMOVEFILTERS ( DimDate[Year] ) ), CALCULATE ( [Total Requests], REMOVEFILTERS ( DimDate[Year], DimDate[Month], DimDate[Month Number] ) ) )
+			formatString: 0.0%
+			displayFolder: Patterns
+
+		measure 'Requests in Gap Bucket' = VAR Low = SELECTEDVALUE ( GapBuckets[Min Days] ) VAR High = SELECTEDVALUE ( GapBuckets[Max Days] ) RETURN COALESCE ( SUMX ( Requests, VAR Gap = COALESCE ( Requests[Days Since Previous (Recipient)], Requests[Days Since Previous (Requester)] ) RETURN IF ( NOT ISBLANK ( Gap ) && Gap >= Low && Gap <= High, 1 ) ), 0 )
+			formatString: #,0
+			displayFolder: Patterns
+
+		measure 'Holiday Band' = IF ( SELECTEDVALUE ( DimDate[Holiday Month] ) = "Yes", MAXX ( ALLSELECTED ( DimDate[Month Start] ), [Total Requests] ) )
+			formatString: #,0
+			displayFolder: Patterns
+
+		measure 'Selected Person' = SELECTEDVALUE ( People[Person] )
+			displayFolder: Lookup
+
+		measure 'Lookup Prompt' = IF ( ISBLANK ( [Selected Person] ), "Type a name to see their request history", "" )
+			displayFolder: Lookup
+
+		measure 'Frequent Banner' = IF ( SELECTEDVALUE ( People[Frequent] ) = "Yes", "FREQUENT REQUESTER", "" )
+			displayFolder: Lookup
+
+		measure 'No History Message' = IF ( NOT ISBLANK ( [Selected Person] ) && [Total Requests] = 0, "No prior requests found.", "" )
+			displayFolder: Lookup
+
+		measure 'Days Since Previous (Role)' = SWITCH ( SELECTEDVALUE ( PersonRequests[Role] ), "Recipient", MAX ( Requests[Days Since Previous (Recipient)] ), "Requester", MAX ( Requests[Days Since Previous (Requester)] ), MIN ( MAX ( Requests[Days Since Previous (Recipient)] ), MAX ( Requests[Days Since Previous (Requester)] ) ) )
+			formatString: 0
+			displayFolder: Lookup
+
+		measure 'Timeline Y' = IF ( [Total Requests] > 0, 1 )
+			formatString: 0
+			displayFolder: Lookup
+
+		measure 'Outcome Color' = SWITCH ( SELECTEDVALUE ( Requests[Outcome] ), "Approved", "#2EB67D", "Denied", "#E5484D", "Pending", "#F5A623", "Needs Review", "#7B61FF", "#8A96A3" )
+			displayFolder: Formatting
+
+		measure 'Certificate Flag' = IF ( SELECTEDVALUE ( Requests[Certificate Attached] ) = "Yes", 1, 0 )
+			formatString: 0
+			displayFolder: Formatting
+
+		measure 'Frequent Color' = IF ( SELECTEDVALUE ( People[Frequent] ) = "Yes", "#E5484D", "#12344D" )
+			displayFolder: Formatting
+
+		measure 'Gap Bucket Color' = IF ( SELECTEDVALUE ( GapBuckets[Within 120 Days] ) = "Yes", "#E5484D", "#8A96A3" )
+			displayFolder: Formatting
+
+		measure 'Mock Data Banner' = IF ( COALESCE ( CALCULATE ( COUNTROWS ( Requests ), CONTAINSSTRING ( Requests[Ticket URL], "example.invalid" ), REMOVEFILTERS () ), 0 ) > 0, "MOCK DATA - not real tickets", "" )
+			displayFolder: Formatting
+
+		measure 'Last Refreshed' = VAR LastOk = CALCULATE ( MAX ( RunLog[Finished (Local)] ), RunLog[Status] = "Success" ) RETURN IF ( ISBLANK ( LastOk ), "Last refreshed: no successful run yet", "Last refreshed: " & FORMAT ( LastOk, "mmm d, yyyy h:mm AM/PM" ) )
+			displayFolder: Refresh
+
+		measure 'Latest Run Status' = VAR LastRun = MAX ( RunLog[Run] ) RETURN CALCULATE ( SELECTEDVALUE ( RunLog[Status] ), RunLog[Run] = LastRun )
+			displayFolder: Refresh
+
+		measure 'Hours Since Last Success' = VAR LastOk = CALCULATE ( MAX ( RunLog[Finished (UTC)] ), RunLog[Status] = "Success" ) RETURN IF ( NOT ISBLANK ( LastOk ), ( UTCNOW () - LastOk ) * 24 )
+			formatString: 0.0
+			displayFolder: Refresh
+
+		measure 'Refresh Health' = IF ( [Latest Run Status] <> "Success" || ISBLANK ( [Hours Since Last Success] ) || [Hours Since Last Success] > 36, "Attention: check the refresh log", "Healthy" )
+			displayFolder: Refresh
+
+		measure 'Refresh Health Color' = IF ( [Refresh Health] = "Healthy", "#2EB67D", "#E5484D" )
+			displayFolder: Refresh
+
+		column Placeholder
+			dataType: string
+			isHidden
+			summarizeBy: none
+			sourceColumn: Placeholder
+
+		partition _Measures = m
+			mode: import
+			source =
+					#table(type table [Placeholder = text], {})
+
+	relationship PersonRequests_People
+		fromColumn: PersonRequests.Person
+		toColumn: People.Person
+
+	relationship PersonRequests_Requests
+		crossFilteringBehavior: bothDirections
+		fromColumn: PersonRequests.'Ticket ID'
+		toColumn: Requests.'Ticket ID'
+
+	relationship Requests_DimDate
+		fromColumn: Requests.'Created Date'
+		toColumn: DimDate.Date
+
+	relationship FormAnswers_Requests
+		fromColumn: FormAnswers.'Ticket ID'
+		toColumn: Requests.'Ticket ID'
+
+	role 'Program Owners'
+		modelPermission: read
