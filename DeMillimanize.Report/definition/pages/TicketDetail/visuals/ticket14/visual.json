@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "ticket14",
   "position": {
-    "x": 396,
-    "y": 680,
+    "x": 836,
+    "y": 660,
     "z": 14,
-    "height": 376,
-    "width": 364,
+    "height": 396,
+    "width": 356,
     "tabOrder": 14
   },
   "visual": {
@@ -37,11 +37,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Subject"
+                  "Property": "Created Date"
                 }
               },
-              "queryRef": "Requests.Subject",
-              "nativeQueryRef": "Subject"
+              "queryRef": "Requests.Created Date",
+              "nativeQueryRef": "Created Date"
             },
             {
               "field": {
@@ -51,11 +51,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Matched Phrase"
+                  "Property": "Outcome Evidence"
                 }
               },
-              "queryRef": "Requests.Matched Phrase",
-              "nativeQueryRef": "Matched Phrase"
+              "queryRef": "Requests.Outcome Evidence",
+              "nativeQueryRef": "Outcome Evidence"
             }
           ]
         }
@@ -114,7 +114,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "58D"
+                  "Value": "56D"
                 }
               }
             }
@@ -128,13 +128,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "145D"
+                  "Value": "85D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Subject"
+            "metadata": "Requests.Created Date"
           }
         },
         {
@@ -142,13 +142,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "170D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Matched Phrase"
+            "metadata": "Requests.Outcome Evidence"
           }
         }
       ]
@@ -167,7 +167,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Worklist: match needs review'"
+                  "Value": "'Outcome needs review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -180,7 +193,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Worklist: match needs review'"
+                  "Value": "'Outcome needs review'"
                 }
               }
             }
@@ -193,7 +206,7 @@
   "filterConfig": {
     "filters": [
       {
-        "name": "f_Requests_Match_Needs_Review",
+        "name": "f_Requests_Outcome",
         "field": {
           "Column": {
             "Expression": {
@@ -201,7 +214,7 @@
                 "Entity": "Requests"
               }
             },
-            "Property": "Match Needs Review"
+            "Property": "Outcome"
           }
         },
         "type": "Categorical",
@@ -226,7 +239,7 @@
                             "Source": "r"
                           }
                         },
-                        "Property": "Match Needs Review"
+                        "Property": "Outcome"
                       }
                     }
                   ],
@@ -234,7 +247,7 @@
                     [
                       {
                         "Literal": {
-                          "Value": "'Yes'"
+                          "Value": "'Needs Review'"
                         }
                       }
                     ]

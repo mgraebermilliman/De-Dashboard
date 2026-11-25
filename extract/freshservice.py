@@ -96,6 +96,22 @@ class FreshserviceClient:
         body, _ = self._request(self._url(path, params))
         return body
 
+    def download(self, url: str, max_bytes: int = 5_000_000) -> bytes:
+        """GET a ticket attachment's pre-signed link. The API key is deliberately not sent."""
+        parts = urllib.parse.urlsplit(url)
+        if parts.scheme != "https" or not (parts.hostname or "").lower().endswith(".freshservice.com"):
+            raise FreshserviceError("Refusing to download from a host outside freshservice.com.")
+        try:
+            with self._opener.open(urllib.request.Request(url, method="GET"), timeout=self._timeout) as resp:
+                data = resp.read(max_bytes + 1)
+        except urllib.error.HTTPError as err:
+            raise FreshserviceError(f"HTTP {err.code} downloading an attachment") from None
+        except urllib.error.URLError as err:
+            raise FreshserviceError(f"Could not download an attachment: {err.reason}") from None
+        if len(data) > max_bytes:
+            raise FreshserviceError("Attachment is larger than expected.")
+        return data
+
     def get_all(self, path: str, key: str, params: dict | None = None, page_delay: float = 0.5):
         """Yield every item across all pages of a list endpoint."""
         params = {"per_page": 100, **(params or {})}

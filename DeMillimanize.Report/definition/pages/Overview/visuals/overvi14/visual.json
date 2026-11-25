@@ -2,68 +2,55 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "overvi14",
   "position": {
-    "x": 24,
-    "y": 846,
+    "x": 1152,
+    "y": 228,
     "z": 14,
-    "height": 92,
-    "width": 300,
+    "height": 124,
+    "width": 368,
     "tabOrder": 14
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "_Measures"
                     }
                   },
-                  "Property": "Match Source"
+                  "Property": "Frequent People"
                 }
               },
-              "queryRef": "Requests.Match Source",
-              "nativeQueryRef": "Match Source"
+              "queryRef": "_Measures.Frequent People",
+              "nativeQueryRef": "Frequent People"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
+                  "Value": "40D"
                 }
               }
             }
           }
         }
       ],
-      "header": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "selection": [
-        {
-          "properties": {
-            "strictSingleSelect": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -88,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Match Source'"
+                  "Value": "'Frequent people'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Match Source'"
+                  "Value": "'Frequent People'"
                 }
               }
             }

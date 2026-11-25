@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Needs Review"
+                  "Property": "Waiting for Confirmation"
                 }
               },
-              "queryRef": "_Measures.Needs Review",
-              "nativeQueryRef": "Needs Review"
+              "queryRef": "_Measures.Waiting for Confirmation",
+              "nativeQueryRef": "Waiting for Confirmation"
             }
           ]
         }
@@ -75,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Outcome needs review'"
+                  "Value": "'Waiting for confirmation'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -88,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Needs Review'"
+                  "Value": "'Waiting for Confirmation'"
                 }
               }
             }

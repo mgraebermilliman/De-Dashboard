@@ -52,11 +52,12 @@ The dashboard lets the program owner type in a name and see right away:
 
 **Power BI**, built on an Excel workbook that a Python extract rewrites twice a day. The Power BI design follows Michael's specification, merged with this project's rules.
 
-- The **extract** (`python run.py extract`) reads Freshservice (read-only, as the ADM account). It finds the De-Millimanize tickets, decides each outcome, flags frequent requesters, and writes `DeMillimanize Requests.xlsx` with 5 tables: Requests, People, PersonRequests, FormAnswers and RunLog.
+- The **extract** (`python run.py extract`) reads Freshservice (read-only, as the ADM account). It finds the De-Millimanize tickets, decides each outcome, flags frequent requesters, and writes `DeMillimanize Requests.xlsx` with 6 tables: Requests, People, PersonRequests, FormAnswers, Unconfirmed and RunLog.
+- Tickets the wording rules aren't sure about go to **Unconfirmed** and aren't counted until a person confirms them once.
 - **Power BI** only reads that workbook. It never calls Freshservice and never needs an API key.
 - The report has 4 pages:
+  - **Overview** (opens first): the totals, requests by month, models and the latest requests.
   - **Request Lookup:** type a name, then see their history and the frequent flag.
-  - **Overview**
   - **Frequent and Patterns**
   - **Ticket Detail and Data Quality**
 - In Power BI Desktop, **Refresh** reloads the workbook. `tools\run-extract.cmd` updates the workbook on demand.
@@ -78,8 +79,8 @@ The reasons for this choice are recorded in [OVERVIEW.md](OVERVIEW.md).
 | `tests/` | Unit tests. They use fake data only. |
 | `tools/` | Double-click launchers: `probe.cmd`, `run-extract.cmd`, `schedule-extract.cmd` |
 | `run.py` | Entry point used by the launchers. It works from a UNC path. |
-| `requirements.txt` | The one dependency (openpyxl), already installed machine-wide |
-| `data/` | The real workbook, run state and the outcome override file. **Git-ignored. Contains real employee data.** |
+| `requirements.txt` | openpyxl (required) and pypdf (optional, reads Certificate of Destruction PDFs) |
+| `data/` | The real workbook, run state, the outcome override file and the confirmation file. **Git-ignored. Contains real employee data.** |
 
 ## Getting started
 
@@ -112,5 +113,21 @@ python -m unittest discover -s tests -t .
 - `Reviewed On` must be in `YYYY-MM-DD` format.
 
 The next run applies it, with Outcome Source "Manual Override".
+
+**Include archived tickets** (older than about a year): run `python run.py archive` once.
+
+- A new scan starts at tickets created on or after **2023-07-01**, the same date as the data cutoff below. Change it with `DEDASH_ARCHIVE_SINCE`, or run `python run.py archive --all` to scan from the very first ticket.
+- **Data cutoff:** tickets created before **2023-07-01** are left out of the workbook (earlier data isn't relevant). Change it with `DEDASH_DATA_START`; blank keeps everything.
+- It reads the archived ticket list, which is slow: roughly 12 seconds a page, 4 at a time. From 2024 that is about 430 pages, so allow about an hour. The whole archive is about 1,140 pages.
+- It can be stopped at any time and picks up where it left off. Later runs only read pages added since.
+- Then run the extract again to rebuild the workbook. Until the scan has finished, the RunLog message says so.
+- Only the subject of an archived ticket can be screened, so an archived request with a plain subject is missed.
+- After changing the wording rules in `extract/classify.py`, run `python run.py archive --restart`.
+
+**Confirm a ticket the rules weren't sure about:** these tickets are listed in the workbook's `Unconfirmed` sheet and on the report's Data Quality page. They aren't counted until someone answers. Add a row to `data\match_confirmations.csv`:
+
+- Columns: `Ticket ID, Is De-Millimanize, Reviewed By, Reviewed On, Note`
+- `Is De-Millimanize` must be Yes or No. Yes counts the ticket as a request. No removes it for good.
+- Each ticket only needs an answer once. The next run applies it.
 
 **Build the Power BI report:** follow [powerbi/GUIDE.md](powerbi/GUIDE.md). Start with fake data from `python run.py mock`. After changing the workbook columns, regenerate the model script with `python run.py tmdl`. To regenerate the 4 report pages, close Power BI Desktop and run `python run.py pages`.

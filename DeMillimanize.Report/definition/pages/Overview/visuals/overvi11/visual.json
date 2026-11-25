@@ -3,67 +3,54 @@
   "name": "overvi11",
   "position": {
     "x": 24,
-    "y": 546,
+    "y": 228,
     "z": 11,
-    "height": 92,
-    "width": 300,
+    "height": 124,
+    "width": 368,
     "tabOrder": 11
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "_Measures"
                     }
                   },
-                  "Property": "Requester Name"
+                  "Property": "Total Requests"
                 }
               },
-              "queryRef": "Requests.Requester Name",
-              "nativeQueryRef": "Requester Name"
+              "queryRef": "_Measures.Total Requests",
+              "nativeQueryRef": "Total Requests"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
+                  "Value": "40D"
                 }
               }
             }
           }
         }
       ],
-      "header": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "selection": [
-        {
-          "properties": {
-            "strictSingleSelect": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -88,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Requester'"
+                  "Value": "'Total requests'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Requester'"
+                  "Value": "'Total Requests'"
                 }
               }
             }

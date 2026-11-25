@@ -37,11 +37,12 @@
                       "Entity": "People"
                     }
                   },
-                  "Property": "Last Request"
+                  "Property": "Last Received"
                 }
               },
-              "queryRef": "People.Last Request",
-              "nativeQueryRef": "Last Request"
+              "queryRef": "People.Last Received",
+              "nativeQueryRef": "Last Received",
+              "displayName": "Last received"
             },
             {
               "field": {
@@ -70,7 +71,7 @@
                     "Entity": "People"
                   }
                 },
-                "Property": "Last Request"
+                "Property": "Last Received"
               }
             },
             "direction": "Descending"
@@ -152,7 +153,7 @@
             }
           },
           "selector": {
-            "metadata": "People.Last Request"
+            "metadata": "People.Last Received"
           }
         },
         {
@@ -186,6 +187,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'Frequent people (all, not just the searched name)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

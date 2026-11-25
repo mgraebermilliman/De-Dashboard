@@ -19,7 +19,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Overview",
+                    "value": "De-Millimanize Dashboard",
                     "textStyle": {
                       "fontWeight": "bold",
                       "fontSize": "20pt",
@@ -71,7 +71,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Overview page header'"
+                  "Value": "'De-Millimanize Dashboard page header'"
                 }
               }
             }

@@ -6,205 +6,77 @@
     "y": 128,
     "z": 7,
     "height": 440,
-    "width": 940,
+    "width": 1872,
     "tabOrder": 7
   },
   "visual": {
-    "visualType": "tableEx",
+    "visualType": "pivotTable",
     "query": {
       "queryState": {
-        "Values": {
+        "Rows": {
           "projections": [
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "People"
+                      "Entity": "DimDate"
                     }
                   },
-                  "Property": "Person"
+                  "Property": "Year"
                 }
               },
-              "queryRef": "People.Person",
-              "nativeQueryRef": "Person"
-            },
+              "queryRef": "DimDate.Year",
+              "nativeQueryRef": "Year"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "People"
+                      "Entity": "DimDate"
                     }
                   },
-                  "Property": "Requests Made"
+                  "Property": "Month"
                 }
               },
-              "queryRef": "People.Requests Made",
-              "nativeQueryRef": "Requests Made"
-            },
+              "queryRef": "DimDate.Month",
+              "nativeQueryRef": "Month"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "People"
+                      "Entity": "_Measures"
                     }
                   },
-                  "Property": "Requests Made For Others"
+                  "Property": "Total Requests"
                 }
               },
-              "queryRef": "People.Requests Made For Others",
-              "nativeQueryRef": "Requests Made For Others"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Times Named As Recipient"
-                }
-              },
-              "queryRef": "People.Times Named As Recipient",
-              "nativeQueryRef": "Times Named As Recipient"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Approved"
-                }
-              },
-              "queryRef": "People.Approved",
-              "nativeQueryRef": "Approved"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Denied"
-                }
-              },
-              "queryRef": "People.Denied",
-              "nativeQueryRef": "Denied"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Last Request"
-                }
-              },
-              "queryRef": "People.Last Request",
-              "nativeQueryRef": "Last Request"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Shortest Gap (Days)"
-                }
-              },
-              "queryRef": "People.Shortest Gap (Days)",
-              "nativeQueryRef": "Shortest Gap (Days)"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Frequent"
-                }
-              },
-              "queryRef": "People.Frequent",
-              "nativeQueryRef": "Frequent"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "People"
-                    }
-                  },
-                  "Property": "Technician"
-                }
-              },
-              "queryRef": "People.Technician",
-              "nativeQueryRef": "Technician"
+              "queryRef": "_Measures.Total Requests",
+              "nativeQueryRef": "Total Requests"
             }
           ]
         }
-      },
-      "sortDefinition": {
-        "sort": [
-          {
-            "field": {
-              "Column": {
-                "Expression": {
-                  "SourceRef": {
-                    "Entity": "People"
-                  }
-                },
-                "Property": "Shortest Gap (Days)"
-              }
-            },
-            "direction": "Ascending"
-          }
-        ],
-        "isDefaultSort": false
       }
     },
     "objects": {
-      "columnHeaders": [
-        {
-          "properties": {
-            "wordWrap": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "autoSizeColumnWidth": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
       "values": [
         {
           "properties": {
-            "wordWrap": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "true"
+                  "Value": "14D"
                 }
               }
             }
@@ -212,7 +84,7 @@
         },
         {
           "properties": {
-            "fontColor": {
+            "backColor": {
               "solid": {
                 "color": {
                   "expr": {
@@ -222,7 +94,7 @@
                           "Entity": "_Measures"
                         }
                       },
-                      "Property": "Frequent Color"
+                      "Property": "Heatmap Color"
                     }
                   }
                 }
@@ -237,17 +109,43 @@
                 }
               }
             ],
-            "metadata": "People.Person"
+            "metadata": "_Measures.Total Requests"
           }
         }
       ],
-      "total": [
+      "columnHeaders": [
         {
           "properties": {
-            "totals": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "false"
+                  "Value": "13D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "rowHeaders": [
+        {
+          "properties": {
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "13D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "grid": [
+        {
+          "properties": {
+            "rowPadding": {
+              "expr": {
+                "Literal": {
+                  "Value": "5D"
                 }
               }
             }
@@ -260,13 +158,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "134D"
+                  "Value": "128D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "People.Person"
+            "metadata": "_Measures.Total Requests"
           }
         },
         {
@@ -274,125 +172,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "78D"
+                  "Value": "140D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "People.Requests Made"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "89D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Requests Made For Others"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "89D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Times Named As Recipient"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "78D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Approved"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "67D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Denied"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "100D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Last Request"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "89D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Shortest Gap (Days)"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "78D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Frequent"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "89D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "People.Technician"
+            "metadata": "DimDate.Year"
           }
         }
       ]
@@ -411,7 +197,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'People ranked (shortest gap first)'"
+                  "Value": "'Requests by month and year (darker = busier month)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -424,7 +223,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'People ranked (shortest gap first)'"
+                  "Value": "'Requests by month and year (darker = busier month)'"
                 }
               }
             }

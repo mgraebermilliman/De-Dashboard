@@ -8,7 +8,7 @@ Run:  python run.py tmdl
 from pathlib import Path
 
 from extract.tables import (FORM_ANSWERS_COLUMNS, PEOPLE_COLUMNS, PERSON_REQUESTS_COLUMNS,
-                            REQUESTS_COLUMNS, RUNLOG_COLUMNS)
+                            REQUESTS_COLUMNS, RUNLOG_COLUMNS, UNCONFIRMED_COLUMNS)
 
 OUTPUT = Path(__file__).resolve().parent / "DeMillimanize.model.tmdl"
 DEFAULT_PATH = r"O:\De-Dashboard\sample_data\DeMillimanize Requests.mock.xlsx"
@@ -18,24 +18,28 @@ INT = {"Ticket ID", "Requester Request #", "Days Since Previous (Requester)", "R
        "Days Since Previous (Recipient)", "Requests Made", "Requests Made For Others",
        "Times Named As Recipient", "Approved", "Denied", "Pending", "Needs Review", "Shortest Gap (Days)",
        "Run", "Tickets Listed", "Forms Checked", "Matched Total", "API Calls"}
-DATE = {"Created Date", "First Request", "Last Request"}
+DATE = {"Created Date", "First Request", "Last Request", "Last Received", "COD Erase Date"}
 DATETIME = {"Decision Date", "Closed Date", "Last Updated", "Started (UTC)", "Finished (UTC)", "Finished (Local)"}
 NO_SUM = {"Ticket ID", "Run", "Requester Request #", "Recipient Request #", "Days Since Previous (Requester)",
           "Days Since Previous (Recipient)", "Shortest Gap (Days)"}
 HIDDEN = {("PersonRequests", "Person"), ("PersonRequests", "Ticket ID"), ("FormAnswers", "Ticket ID")}
 FOLDERS = {
     "Ticket": ["Ticket ID", "Ticket URL", "Created Date", "Ticket Type", "Status", "Item Stage", "Closed Date",
-               "Subject", "Resolution Note", "Last Updated"],
+               "Subject", "Resolution Note", "Last Updated", "Archived"],
     "People": ["Requester Name", "Requester Email", "Department", "Computer Provided To",
                "Recipient Differs From Requester", "Requested For", "Requester Is Technician",
-               "Recipient Is Technician"],
+               "Recipient Is Technician", "Recipient Source"],
     "Outcome": ["Outcome", "Outcome Source", "Outcome Evidence", "Approver", "Decision Date"],
-    "Device": ["Device Type", "PC Make and Model", "PC Serial Number", "Most Recent PC Name",
-               "Certificate Attached", "Certificate File", "Certificate Missing"],
+    "Device": ["Device Type", "PC Make and Model", "PC Serial Number", "Most Recent PC Name", "Model",
+               "Model Line", "Model Source", "Model Group", "Certificate Attached", "Certificate File",
+               "Certificate Missing"],
     "Frequency": ["Frequent (Requester)", "Requester Request #", "Days Since Previous (Requester)",
                   "Frequent (Recipient)", "Recipient Request #", "Days Since Previous (Recipient)",
                   "Same Serial Seen Before", "Holiday Season"],
-    "Matching": ["Match Source", "Matched Phrase", "Matched Field", "Match Needs Review"],
+    "Matching": ["Match Source", "Matched Phrase", "Matched Field", "Match Needs Review", "Match Confidence"],
+    "Certificate Details": ["COD Erase Date", "COD Erase Method", "COD Erase Result", "COD Erase Errors",
+                            "COD Motherboard", "COD Processor", "COD Memory", "COD Drive Size", "COD OS",
+                            "COD BIOS", "COD Device Serial", "COD Serial Matches Ticket"],
 }
 FOLDER_OF = {col: folder for folder, cols in FOLDERS.items() for col in cols}
 
@@ -187,7 +191,11 @@ MEASURES = [
     ("Requests Made For Others", COUNT.format(filter='Requests[Recipient Differs From Requester] = "Yes"'), "#,0", "Counts"),
     ("Duplicate Serials", COUNT.format(filter='Requests[Same Serial Seen Before] = "Yes"'), "#,0", "Counts"),
     ("Certificates Missing", COUNT.format(filter='Requests[Certificate Missing] = "Yes"'), "#,0", "Counts"),
+    ("Serial Mismatches", COUNT.format(filter='Requests[COD Serial Matches Ticket] = "No"'), "#,0", "Counts"),
+    ("Latest Request", "MAX ( Requests[Created Date] )", "mmm d, yyyy", "Counts"),
     ("Match Needs Review", COUNT.format(filter='Requests[Match Needs Review] = "Yes"'), "#,0", "Counts"),
+    # Tickets the wording rules weren't sure about. They aren't counted as requests until a person confirms them.
+    ("Waiting for Confirmation", "COALESCE ( COUNTROWS ( Unconfirmed ), 0 )", "#,0", "Counts"),
     ("Technician-Listed Requests", COUNT.format(filter='Requests[Recipient Is Technician] = "Yes"'), "#,0", "Counts"),
     ("Approval Rate %", "DIVIDE ( [Approved], [Approved] + [Denied] )", "0.0%", "Rates"),
     ("Denial Rate %", "DIVIDE ( [Denied], [Approved] + [Denied] )", "0.0%", "Rates"),
@@ -201,6 +209,10 @@ MEASURES = [
 	DATEDIFF ( Requests[Created Date], Requests[Decision Date], DAY )
 )""", "0.0", "Timing"),
     ("Requests Same Period Last Year", "CALCULATE ( [Total Requests], SAMEPERIODLASTYEAR ( DimDate[Date] ) )",
+     "#,0", "Timing"),
+    # Blank (not 0) when there is nothing, so month charts only show months that have data.
+    ("Requests by Period", "COUNTROWS ( Requests )", "#,0", "Timing"),
+    ("Same Month Last Year", "IF ( MIN ( DimDate[Date] ) <= TODAY (), CALCULATE ( COUNTROWS ( Requests ), SAMEPERIODLASTYEAR ( DimDate[Date] ) ) )",
      "#,0", "Timing"),
     ("Requests MoM Change", """VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) )
 RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), [Total Requests] - Previous )""", "+#,0;-#,0;0", "Timing"),
@@ -224,6 +236,19 @@ RETURN
 			Requests,
 			VAR Gap = COALESCE ( Requests[Days Since Previous (Recipient)], Requests[Days Since Previous (Requester)] )
 			RETURN IF ( NOT ISBLANK ( Gap ) && Gap >= Low && Gap <= High, 1 )
+		),
+		0
+	)""", "#,0", "Patterns"),
+    # People by the shortest gap between any two of their requests (as requester or as recipient).
+    ("People in Gap Bucket", """VAR Low = SELECTEDVALUE ( GapBuckets[Min Days] )
+VAR High = SELECTEDVALUE ( GapBuckets[Max Days] )
+RETURN
+	COALESCE (
+		COUNTROWS (
+			FILTER (
+				People,
+				NOT ISBLANK ( People[Shortest Gap (Days)] ) && People[Shortest Gap (Days)] >= Low && People[Shortest Gap (Days)] <= High
+			)
 		),
 		0
 	)""", "#,0", "Patterns"),
@@ -256,6 +281,19 @@ RETURN
     ("Frequent Color", 'IF ( SELECTEDVALUE ( People[Frequent] ) = "Yes", "#E5484D", "#12344D" )', None, "Formatting"),
     ("Gap Bucket Color", 'IF ( SELECTEDVALUE ( GapBuckets[Within 120 Days] ) = "Yes", "#E5484D", "#8A96A3" )', None,
      "Formatting"),
+    # Month-by-year heatmap: darker teal = closer to the busiest month shown. Totals stay white.
+    ("Heatmap Color", """VAR ThisMonth = [Total Requests]
+VAR BusiestMonth = CALCULATE ( MAXX ( SUMMARIZE ( DimDate, DimDate[Year], DimDate[Month Number] ), [Total Requests] ), ALLSELECTED ( DimDate ) )
+RETURN
+	SWITCH (
+		TRUE (),
+		NOT ISINSCOPE ( DimDate[Year] ) || NOT ISINSCOPE ( DimDate[Month] ), "#FFFFFF",
+		ThisMonth = 0, "#FFFFFF",
+		DIVIDE ( ThisMonth, BusiestMonth ) <= 0.25, "#D5F4EE",
+		DIVIDE ( ThisMonth, BusiestMonth ) <= 0.5, "#9BE6D8",
+		DIVIDE ( ThisMonth, BusiestMonth ) <= 0.75, "#4DD4BC",
+		"#00C1A0"
+	)""", None, "Formatting"),
     ("Mock Data Banner", """IF (
 	COALESCE ( CALCULATE ( COUNTROWS ( Requests ), CONTAINSSTRING ( Requests[Ticket URL], "example.invalid" ), REMOVEFILTERS () ), 0 ) > 0,
 	"MOCK DATA - not real tickets",
@@ -299,6 +337,7 @@ def build() -> str:
     lines += table("PersonRequests", PERSON_REQUESTS_COLUMNS, "Ticket ID")
     lines += table("FormAnswers", FORM_ANSWERS_COLUMNS, "Ticket ID")
     lines += table("RunLog", RUNLOG_COLUMNS, "Run")
+    lines += table("Unconfirmed", UNCONFIRMED_COLUMNS, "Ticket ID")
 
     lines += ["\ttable DimDate", "\t\tdataCategory: Time", ""]
     for name, dtype, fmt, extra in DIMDATE_COLUMNS:

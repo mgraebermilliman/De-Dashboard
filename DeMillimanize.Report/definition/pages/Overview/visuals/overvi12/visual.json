@@ -2,68 +2,55 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "overvi12",
   "position": {
-    "x": 24,
-    "y": 646,
+    "x": 400,
+    "y": 228,
     "z": 12,
-    "height": 92,
-    "width": 300,
+    "height": 124,
+    "width": 368,
     "tabOrder": 12
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "_Measures"
                     }
                   },
-                  "Property": "Computer Provided To"
+                  "Property": "Approved"
                 }
               },
-              "queryRef": "Requests.Computer Provided To",
-              "nativeQueryRef": "Computer Provided To"
+              "queryRef": "_Measures.Approved",
+              "nativeQueryRef": "Approved"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
+                  "Value": "40D"
                 }
               }
             }
           }
         }
       ],
-      "header": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "selection": [
-        {
-          "properties": {
-            "strictSingleSelect": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -88,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Computer Provided To'"
+                  "Value": "'Approved'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Computer Provided To'"
+                  "Value": "'Approved'"
                 }
               }
             }

@@ -57,10 +57,11 @@ def form_ticket(tid, created, requester, recipient, model, serial, status="Close
     }
 
 
-def legacy_ticket(tid, created, requester, subject, status="Closed", approvals=(), notes=()):
+def legacy_ticket(tid, created, requester, subject, status="Closed", approvals=(), notes=(),
+                  description="I would like to keep my old laptop for personal use."):
     return {
         "id": tid, "type": "Service Request", "subject": subject,
-        "description_text": "I would like to keep my old laptop for personal use.",
+        "description_text": description,
         "status": status, "status_code": None,
         "created_at": created, "updated_at": created, "closed_at": created if status == "Closed" else None,
         "sub_category": None, "department": PEOPLE[requester][2],
@@ -95,6 +96,9 @@ def mock_bundles() -> list[dict]:
                     status="Open", cert=False),
         legacy_ticket(900014, "2026-11-12T14:43:00", "sam", "Question about demillimanized laptops",
                       status="Pending"),
+        # Only mentions the word, so it waits in the Unconfirmed table until a person says yes or no.
+        legacy_ticket(900015, "2026-11-14T09:00:00", "drew", "Remote restart",
+                      description="Please restart my PC. I am travelling with a de-millimanized laptop."),
     ]
 
 

@@ -1,3 +1,6 @@
 # Already installed machine-wide at C:\Program Files\Python313 (checked 2026-11-19).
 # Needed to write the Excel workbook with named tables that Power BI reads.
 openpyxl==3.1.5
+# Optional. Reads the text of the Certificate of Destruction PDFs (model, processor, memory, erase result).
+# Without it the extract still runs and the COD columns stay blank.
+pypdf==7.1.1

@@ -1,0 +1,78 @@
+table Unconfirmed
+
+	column 'Ticket ID'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Ticket ID
+
+	column 'Ticket URL'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Ticket URL
+		dataCategory: WebUrl
+
+	column 'Created Date'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		summarizeBy: none
+		sourceColumn: Created Date
+
+	column 'Requester Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Requester Name
+
+	column Subject
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Subject
+
+	column Confidence
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Confidence
+
+	column Evidence
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Evidence
+
+	column Excerpt
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Excerpt
+
+	column 'Resolution Note'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Resolution Note
+
+	column Archived
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Archived
+
+	partition Unconfirmed = m
+		mode: import
+		source =
+				let
+					Source = Workbook{[Item="Unconfirmed", Kind="Table"]}[Data],
+					Typed = Table.TransformColumnTypes(Source, {
+										{"Ticket ID", Int64.Type},
+										{"Ticket URL", type text},
+										{"Created Date", type date},
+										{"Requester Name", type text},
+										{"Subject", type text},
+										{"Confidence", type text},
+										{"Evidence", type text},
+										{"Excerpt", type text},
+										{"Resolution Note", type text},
+										{"Archived", type text}
+					}),
+					Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
+				in
+					Rows
+
+	annotation PBI_ResultType = Table
+

@@ -56,6 +56,25 @@ table _Measures
 		displayFolder: Counts
 		lineageTag: 202d66c1-2c09-4910-b96b-01eea2f6914f
 
+	measure 'Serial Mismatches' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[COD Serial Matches Ticket] = "No" ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+
+	measure 'Latest Request' = MAX ( Requests[Created Date] )
+		formatString: mmm d, yyyy
+		displayFolder: Counts
+
+	measure 'Waiting for Confirmation' = COALESCE ( COUNTROWS ( Unconfirmed ), 0 )
+		formatString: #,0
+		displayFolder: Counts
+
+	measure 'Heatmap Color' = VAR ThisMonth = [Total Requests] VAR BusiestMonth = CALCULATE ( MAXX ( SUMMARIZE ( DimDate, DimDate[Year], DimDate[Month Number] ), [Total Requests] ), ALLSELECTED ( DimDate ) ) RETURN SWITCH ( TRUE (), NOT ISINSCOPE ( DimDate[Year] ) || NOT ISINSCOPE ( DimDate[Month] ), "#FFFFFF", ThisMonth = 0, "#FFFFFF", DIVIDE ( ThisMonth, BusiestMonth ) <= 0.25, "#D5F4EE", DIVIDE ( ThisMonth, BusiestMonth ) <= 0.5, "#9BE6D8", DIVIDE ( ThisMonth, BusiestMonth ) <= 0.75, "#4DD4BC", "#00C1A0" )
+		displayFolder: Formatting
+
+	measure 'People in Gap Bucket' = VAR Low = SELECTEDVALUE ( GapBuckets[Min Days] ) VAR High = SELECTEDVALUE ( GapBuckets[Max Days] ) RETURN COALESCE ( COUNTROWS ( FILTER ( People, NOT ISBLANK ( People[Shortest Gap (Days)] ) && People[Shortest Gap (Days)] >= Low && People[Shortest Gap (Days)] <= High ) ), 0 )
+		formatString: #,0
+		displayFolder: Patterns
+
 	measure 'Match Needs Review' = COALESCE ( CALCULATE ( COUNTROWS ( Requests ), Requests[Match Needs Review] = "Yes" ), 0 )
 		formatString: #,0
 		displayFolder: Counts
@@ -100,6 +119,14 @@ table _Measures
 		formatString: #,0
 		displayFolder: Timing
 		lineageTag: 21de667b-5710-40b9-9d9e-0393c31aacb1
+
+	measure 'Requests by Period' = COUNTROWS ( Requests )
+		formatString: #,0
+		displayFolder: Timing
+
+	measure 'Same Month Last Year' = IF ( MIN ( DimDate[Date] ) <= TODAY (), CALCULATE ( COUNTROWS ( Requests ), SAMEPERIODLASTYEAR ( DimDate[Date] ) ) )
+		formatString: #,0
+		displayFolder: Timing
 
 	measure 'Requests MoM Change' = VAR Previous = CALCULATE ( [Total Requests], DATEADD ( DimDate[Date], -1, MONTH ) ) RETURN IF ( HASONEVALUE ( DimDate[Month Start] ), [Total Requests] - Previous )
 		formatString: +#,0;-#,0;0

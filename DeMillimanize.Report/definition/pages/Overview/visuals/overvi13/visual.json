@@ -2,68 +2,55 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "overvi13",
   "position": {
-    "x": 24,
-    "y": 746,
+    "x": 776,
+    "y": 228,
     "z": 13,
-    "height": 92,
-    "width": 300,
+    "height": 124,
+    "width": 368,
     "tabOrder": 13
   },
   "visual": {
-    "visualType": "slicer",
+    "visualType": "card",
     "query": {
       "queryState": {
         "Values": {
           "projections": [
             {
               "field": {
-                "Column": {
+                "Measure": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "People"
+                      "Entity": "_Measures"
                     }
                   },
-                  "Property": "Frequent"
+                  "Property": "Needs Review"
                 }
               },
-              "queryRef": "People.Frequent",
-              "nativeQueryRef": "Frequent"
+              "queryRef": "_Measures.Needs Review",
+              "nativeQueryRef": "Needs Review"
             }
           ]
         }
       }
     },
     "objects": {
-      "data": [
+      "labels": [
         {
           "properties": {
-            "mode": {
+            "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "'Dropdown'"
+                  "Value": "40D"
                 }
               }
             }
           }
         }
       ],
-      "header": [
+      "categoryLabels": [
         {
           "properties": {
             "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            }
-          }
-        }
-      ],
-      "selection": [
-        {
-          "properties": {
-            "strictSingleSelect": {
               "expr": {
                 "Literal": {
                   "Value": "false"
@@ -88,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Frequent person'"
+                  "Value": "'Needs review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -101,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Frequent person'"
+                  "Value": "'Needs Review'"
                 }
               }
             }

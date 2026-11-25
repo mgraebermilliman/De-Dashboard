@@ -20,8 +20,9 @@ PAGES_SCHEMA = f"{SCHEMA}/pagesMetadata/1.1.0/schema.json"
 
 NAVY, TEAL, WHITE, RED = "#12344D", "#00C1A0", "#FFFFFF", "#E5484D"
 M = "_Measures"
-PAGES = [("RequestLookup", "Request Lookup"), ("Overview", "Overview"),
+PAGES = [("Overview", "Overview"), ("RequestLookup", "Request Lookup"),
          ("FrequentPatterns", "Frequent and Patterns"), ("TicketDetail", "Ticket Detail and Data Quality")]
+PAGE_TITLES = dict(PAGES)
 
 
 # ---- JSON building blocks (same shapes Power BI Desktop writes) ---------------------------
@@ -53,11 +54,6 @@ def meas(prop: str) -> dict:
     return {"field": field(M, prop, "Measure"), "queryRef": f"{M}.{prop}", "nativeQueryRef": prop}
 
 
-def earliest(entity: str, prop: str) -> dict:
-    agg = {"Aggregation": {"Expression": field(entity, prop), "Function": 3}}  # 3 = Min
-    return {"field": agg, "queryRef": f"Min({entity}.{prop})", "nativeQueryRef": f"Earliest {prop}"}
-
-
 def named(projection: dict, label: str) -> dict:
     return {**projection, "displayName": label}
 
@@ -83,9 +79,26 @@ def equals_filter(entity: str, prop: str, value: str) -> dict:
     }
 
 
+def not_blank_filter(entity: str, prop: str) -> dict:
+    alias = entity[0].lower()
+    column = {"Column": {"Expression": {"SourceRef": {"Source": alias}}, "Property": prop}}
+    return {
+        "name": f"nb_{entity}_{prop}".replace(" ", "_").replace("(", "").replace(")", ""),
+        "field": field(entity, prop),
+        "type": "Advanced",
+        "filter": {
+            "Version": 2,
+            "From": [{"Name": alias, "Entity": entity, "Type": 0}],
+            "Where": [{"Condition": {"Not": {"Expression": {"Comparison": {
+                "ComparisonKind": 0, "Left": column, "Right": {"Literal": {"Value": "null"}}}}}}}],
+        },
+    }
+
+
 class Page:
-    def __init__(self, name: str, title: str):
+    def __init__(self, name: str, title: str, heading: str | None = None):
         self.name, self.title, self.visuals, self.interactions = name, title, [], []
+        self.heading = heading or title
 
     def add(self, vtype: str, x, y, w, h, roles: dict | None = None, title: str | None = None,
             alt: str | None = None, objects: dict | None = None, vc: dict | None = None,
@@ -94,6 +107,7 @@ class Page:
         vc = dict(vc or {})
         if title:
             vc["title"] = [{"properties": {"show": lit("true"), "text": lit(text(title))}}]
+            vc["subTitle"] = [{"properties": {"show": lit("false")}}]
         if alt or title:
             vc["general"] = [{"properties": {"altText": lit(text(alt or title))}}]
         visual = {"visualType": vtype}
@@ -122,17 +136,20 @@ class Page:
         self.interactions.append({"source": source, "target": target, "type": "NoFilter"})
 
     def table(self, x, y, w, h, columns: list, title: str, alt: str | None = None, objects: dict | None = None,
-              filters: list | None = None, sort: tuple | None = None, url: bool = False) -> str:
+              filters: list | None = None, sort: tuple | None = None, url: bool = False, font: int | None = None) -> str:
         """Table with wrapped text and fixed column widths that fit inside the visual (no side scrolling).
 
         columns: list of (projection, relative width).
         """
         scale = (w - 44) / sum(weight for _, weight in columns)
         values = {"wordWrap": lit("true")}
+        headers = {"wordWrap": lit("true"), "autoSizeColumnWidth": lit("false")}
         if url:
             values["urlIcon"] = lit("true")
+        if font:
+            values["fontSize"] = headers["fontSize"] = lit(f"{font}D")
         objs = {
-            "columnHeaders": [{"properties": {"wordWrap": lit("true"), "autoSizeColumnWidth": lit("false")}}],
+            "columnHeaders": [{"properties": headers}],
             "values": [{"properties": values}],
             "total": [{"properties": {"totals": lit("false")}}],
             "columnWidth": [{"properties": {"value": lit(f"{int(weight * scale)}D")},
@@ -145,9 +162,9 @@ class Page:
 
     # ---- shared pieces ----
     def header(self) -> None:
-        self.add("textbox", 0, 0, 1920, 60, alt=f"{self.title} page header",
+        self.add("textbox", 0, 0, 1920, 60, alt=f"{self.heading} page header",
                  objects={"general": [{"properties": {"paragraphs": [{"textRuns": [{
-                     "value": self.title,
+                     "value": self.heading,
                      "textStyle": {"fontWeight": "bold", "fontSize": "20pt", "color": WHITE}}]}]}}]},
                  vc={"background": [{"properties": {"show": lit("true"), "color": color(NAVY),
                                                     "transparency": lit("0D")}}]})
@@ -177,14 +194,20 @@ class Page:
                           "categoryLabels": [{"properties": {"show": lit("false")}}]},
                  vc=vc)
 
-    def slicer(self, entity: str, prop: str, x, y, w, h, mode: str = "Dropdown", title: str | None = None) -> str:
+    def slicer(self, entity: str, prop: str, x, y, w, h, mode: str = "Dropdown", title: str | None = None,
+               search: bool = False, select_all: bool = False, sort: tuple | None = None) -> str:
         # The visual title names the slicer, so the slicer's own header is hidden to leave room for the control.
         objects = {"data": [{"properties": {"mode": lit(text(mode))}}],
                    "header": [{"properties": {"show": lit("false")}}]}
         if mode == "Dropdown":
-            objects["selection"] = [{"properties": {"strictSingleSelect": lit("false")}}]
+            selection = {"strictSingleSelect": lit("false")}
+            if select_all:
+                selection["selectAllCheckboxEnabled"] = lit("true")  # "Select all" on top of the list
+            objects["selection"] = [{"properties": selection}]
+        if search:
+            objects["general"] = [{"properties": {"selfFilterEnabled": lit("true")}}]
         return self.add("slicer", x, y, w, h, roles={"Values": [col(entity, prop)]}, title=title or prop,
-                        alt=f"Filter by {title or prop}", objects=objects)
+                        alt=f"Filter by {title or prop}", objects=objects, sort=sort)
 
 
 OUTCOME_FONT = {"values": [{"properties": {"fontColor": measure_color("Outcome Color")},
@@ -193,12 +216,57 @@ OUTCOME_FONT = {"values": [{"properties": {"fontColor": measure_color("Outcome C
 
 
 # ---- pages -------------------------------------------------------------------------------------
-def request_lookup() -> Page:
-    p = Page(*PAGES[0])
+def overview() -> Page:
+    """Home page: four filters, five numbers, two charts, a practice bar and the latest requests."""
+    p = Page("Overview", PAGE_TITLES["Overview"], heading="De-Millimanize Dashboard")
     p.header()
-    search = p.add("slicer", 24, 128, 600, 96, roles={"Values": [col("People", "Person")]}, title="Search a name",
-                   alt="Search box: choose a person to see their request history",
+    # Nothing picked (or "Select all") is all time; ticking one or more years narrows every visual to them.
+    p.slicer("DimDate", "Year", 24, 128, 456, 88, title="Created date: all time, or pick a year", select_all=True,
+             sort=(col("DimDate", "Year"), "Descending"))
+    for i, (prop, label) in enumerate((("Outcome", "Outcome"), ("Model Line", "Model"), ("Department", "Practice"))):
+        p.slicer("Requests", prop, 492 + i * 472, 128, 460, 88, title=label, search=True)
+    cards = (("Total Requests", "Total requests", 40), ("Approved", "Approved", 40), ("Needs Review", "Needs review", 40),
+             ("Frequent People", "Frequent people", 40), ("Latest Request", "Most recent request", 24))
+    for i, (name, label, size) in enumerate(cards):
+        p.card(name, 24 + i * 376, 228, 368, 124, font=size, title=label)
+    # A date axis thins its own labels, so years of months stay readable (a categorical axis showed every month).
+    p.add("columnChart", 24, 364, 1120, 380, title="Requests by month",
+          roles={"Category": [col("DimDate", "Month Start")], "Series": [col("Requests", "Outcome")],
+                 "Y": [meas("Requests by Period")]},
+          objects={"legend": [{"properties": {"position": lit("'Top'")}}]})
+    p.add("pieChart", 1156, 364, 740, 380, title="Models",
+          roles={"Category": [col("Requests", "Model Group")], "Y": [meas("Total Requests")]},
+          objects={"legend": [{"properties": {"position": lit("'Right'"), "fontSize": lit("8D")}}],
+                   "labels": [{"properties": {"labelStyle": lit("'Percent of total'"), "fontSize": lit("10D")}}]},
+          sort=(meas("Total Requests"), "Descending"))
+    p.add("clusteredBarChart", 24, 756, 560, 300, title="Requests by recipient's practice",
+          roles={"Category": [col("Requests", "Department")], "Y": [meas("Total Requests")]},
+          sort=(meas("Total Requests"), "Descending"))
+    # Everyone named as "Computer provided to" on tickets less than 120 days apart, whatever the filters above say.
+    p.table(596, 756, 556, 300, [(col("People", "Person"), 6), (named(col("People", "Times Named As Recipient"), "Computers"), 3),
+                                 (named(col("People", "Last Received"), "Last received"), 4),
+                                 (named(col("People", "Shortest Gap (Days)"), "Gap (days)"), 3),
+                                 (named(col("People", "Technician"), "Tech"), 2)],
+            title="Frequent: computer provided to, under 120 days apart", alt="People named as the recipient on tickets less than 120 days apart",
+            font=11, filters=[equals_filter("People", "Frequent", "Yes")],
+            sort=(col("People", "Last Received"), "Descending"))
+    p.table(1164, 756, 732, 300, [(col("Requests", "Created Date"), 3), (col("Requests", "Computer Provided To"), 5),
+                                  (col("Requests", "Model"), 6), (col("Requests", "Outcome"), 3),
+                                  (named(col("Requests", "Ticket URL"), "Link"), 1)],
+            title="Most recent requests", url=True, objects=OUTCOME_FONT, font=11,
+            sort=(col("Requests", "Created Date"), "Descending"))
+    return p
+
+
+def request_lookup() -> Page:
+    p = Page("RequestLookup", PAGE_TITLES["RequestLookup"])
+    p.header()
+    # A dropdown with search: click it, start typing a name, and the list narrows to the matches.
+    search = p.add("slicer", 24, 128, 600, 96, roles={"Values": [col("People", "Person")]},
+                   title="Search a name (click, then start typing)",
+                   alt="Search box: type a name and pick the person to see their request history",
                    objects={"data": [{"properties": {"mode": lit("'Dropdown'")}}],
+                            "general": [{"properties": {"selfFilterEnabled": lit("true")}}],
                             "header": [{"properties": {"show": lit("false")}}],
                             "selection": [{"properties": {"strictSingleSelect": lit("true")}}],
                             "items": [{"properties": {"textSize": lit("14D")}}]})
@@ -216,130 +284,91 @@ def request_lookup() -> Page:
           roles={"Values": [named(col("People", c), label) for c, label in counts]},
           objects={"dataLabels": [{"properties": {"fontSize": lit("14D")}}],
                    "categoryLabels": [{"properties": {"fontSize": lit("10D")}}]})
-    frequent = p.table(24, 652, 600, 404, [(col("People", "Person"), 3), (col("People", "Last Request"), 2),
+    frequent = p.table(24, 652, 600, 404, [(col("People", "Person"), 3), (named(col("People", "Last Received"), "Last received"), 2),
                                            (col("People", "Shortest Gap (Days)"), 2)],
                        title="Frequent people (all, not just the searched name)", alt="People flagged as frequent requesters",
                        filters=[equals_filter("People", "Frequent", "Yes")],
-                       sort=(col("People", "Last Request"), "Descending"))
+                       sort=(col("People", "Last Received"), "Descending"))
     p.no_filter(search, frequent)
     # Plain columns only: a measure here would hide rows where it is blank (e.g. a person's first request).
-    history = [(col("Requests", "Created Date"), 8), (col("Requests", "Ticket ID"), 6), (col("PersonRequests", "Role"), 7),
+    history = [(col("Requests", "Created Date"), 7), (col("Requests", "Ticket ID"), 5), (col("PersonRequests", "Role"), 6),
                (col("Requests", "Requester Name"), 10), (col("Requests", "Computer Provided To"), 10),
-               (col("Requests", "Device Type"), 7), (col("Requests", "PC Serial Number"), 9), (col("Requests", "Outcome"), 8),
-               (col("Requests", "Approver"), 9), (col("Requests", "Decision Date"), 8),
-               (col("Requests", "Days Since Previous (Recipient)"), 8), (col("Requests", "Certificate Attached"), 7),
-               (col("Requests", "Outcome Evidence"), 16), (named(col("Requests", "Ticket URL"), "Link"), 4)]
-    p.table(648, 236, 1248, 560, history, title="Request history", url=True,
+               (col("Requests", "Model"), 12), (col("Requests", "Outcome"), 7),
+               (named(col("Requests", "Days Since Previous (Recipient)"), "Days since previous"), 7),
+               (named(col("Requests", "Certificate Attached"), "Certificate"), 6),
+               (named(col("Requests", "Ticket URL"), "Link"), 3)]
+    p.table(648, 236, 1248, 760, history, title="Request history", url=True, font=11,
             alt="Every request for the selected person, newest first", objects=OUTCOME_FONT,
             sort=(col("Requests", "Created Date"), "Descending"))
-    p.card("No History Message", 648, 800, 1248, 44, font=14, alt="Message when the person has no requests", vc=HIDDEN_BOX)
-    p.add("scatterChart", 648, 848, 1248, 208, title="Timeline", alt="Timeline of the person's requests, colored by outcome",
-          roles={"Category": [col("Requests", "Ticket ID")], "Series": [col("Requests", "Outcome")],
-                 "X": [earliest("Requests", "Created Date")], "Y": [meas("Timeline Y")]},
-          objects={"valueAxis": [{"properties": {"show": lit("false")}}]})
-    return p
-
-
-def overview() -> Page:
-    p = Page(*PAGES[1])
-    p.header()
-    p.slicer("DimDate", "Date", 24, 128, 300, 110, mode="Between", title="Created date")
-    y = 246
-    for entity, prop, label in (("Requests", "Outcome", None), ("Requests", "Device Type", None),
-                                ("Requests", "Department", None), ("Requests", "Requester Name", "Requester"),
-                                ("Requests", "Computer Provided To", None), ("People", "Frequent", "Frequent person"),
-                                ("Requests", "Match Source", None)):
-        p.slicer(entity, prop, 24, y, 300, 92, title=label or prop)
-        y += 100
-    for i, name in enumerate(("Total Requests", "Approved", "Denied", "Pending", "Needs Review",
-                              "Approval Rate %", "Frequent People")):
-        p.card(name, 340 + i * 223, 128, 215, 110, font=28, title=name)
-    p.add("lineStackedColumnComboChart", 340, 254, 1556, 400, title="Requests by month (dashed line = same month last year)",
-          roles={"Category": [col("DimDate", "Month Start")], "Series": [col("Requests", "Outcome")],
-                 "Y": [meas("Total Requests")], "Y2": [meas("Requests Same Period Last Year")]},
-          objects={"categoryAxis": [{"properties": {"axisType": lit("'Categorical'")}}],
-                   "lineStyles": [{"properties": {"lineChartType": lit("'linear'"), "lineStyle": lit("'dashed'")}}]})
-    p.add("donutChart", 340, 670, 380, 386, title="Outcome share",
-          roles={"Category": [col("Requests", "Outcome")], "Y": [meas("Total Requests")]},
-          objects={"legend": [{"properties": {"position": lit("'Bottom'")}}]})
-    for i, (prop, label) in enumerate((("Device Type", "By device type"), ("Department", "By department (practice)"),
-                                       ("Approver", "By approver"))):
-        p.add("clusteredBarChart", 736 + i * 388, 670, 380 if i < 2 else 392, 386, title=label,
-              roles={"Category": [col("Requests", prop)], "Y": [meas("Total Requests")]},
-              sort=(meas("Total Requests"), "Descending"))
+    p.card("No History Message", 648, 1004, 1248, 52, font=14, alt="Message when the person has no requests", vc=HIDDEN_BOX)
     return p
 
 
 def frequent_patterns() -> Page:
-    p = Page(*PAGES[2])
+    p = Page("FrequentPatterns", PAGE_TITLES["FrequentPatterns"])
     p.header()
-    ranked = [("Person", 12), ("Requests Made", 7), ("Requests Made For Others", 8), ("Times Named As Recipient", 8),
-              ("Approved", 7), ("Denied", 6), ("Last Request", 9), ("Shortest Gap (Days)", 8), ("Frequent", 7),
-              ("Technician", 8)]
-    p.table(24, 128, 940, 440, [(col("People", c), wt) for c, wt in ranked], title="People ranked (shortest gap first)",
+    wildcard = {"data": [{"dataViewWildcard": {"matchingOption": 1}}], "metadata": f"{M}.Total Requests"}
+    p.add("pivotTable", 24, 128, 1872, 440, title="Requests by month and year (darker = busier month)",
+          roles={"Rows": [col("DimDate", "Year")], "Columns": [col("DimDate", "Month")], "Values": [meas("Total Requests")]},
+          objects={"values": [{"properties": {"fontSize": lit("14D")}},
+                              {"properties": {"backColor": measure_color("Heatmap Color")}, "selector": wildcard}],
+                   "columnHeaders": [{"properties": {"fontSize": lit("13D")}}],
+                   "rowHeaders": [{"properties": {"fontSize": lit("13D")}}],
+                   "grid": [{"properties": {"rowPadding": lit("5D")}}],
+                   "columnWidth": [{"properties": {"value": lit("128D")}, "selector": {"metadata": f"{M}.Total Requests"}},
+                                   {"properties": {"value": lit("140D")}, "selector": {"metadata": "DimDate.Year"}}]})
+    ranked = [("Person", "Person", 12), ("Times Named As Recipient", "Computers received", 7), ("Last Received", "Last received", 8),
+              ("Shortest Gap (Days)", "Shortest gap (days)", 7), ("Frequent", "Frequent", 6), ("Technician", "Technician", 7)]
+    p.table(24, 580, 880, 476, [(named(col("People", c), label), wt) for c, label, wt in ranked],
+            title="People named as recipient more than once (shortest gap first; red = under 120 days)", font=11,
             objects={"values": [{"properties": {"fontColor": measure_color("Frequent Color")},
                                  "selector": {"data": [{"dataViewWildcard": {"matchingOption": 1}}],
                                               "metadata": "People.Person"}}]},
+            filters=[not_blank_filter("People", "Shortest Gap (Days)")],
             sort=(col("People", "Shortest Gap (Days)"), "Ascending"))
-    p.add("pivotTable", 980, 128, 916, 440, title="Requests by month and year (heatmap)",
-          roles={"Rows": [col("DimDate", "Year")], "Columns": [col("DimDate", "Month")], "Values": [meas("Total Requests")]})
-    p.add("lineChart", 24, 584, 620, 472, title="Share of each year's requests by month (Nov-Jan = holiday season)",
-          roles={"Category": [col("DimDate", "Month")], "Series": [col("DimDate", "Year")], "Y": [meas("Share of Year %")]},
-          objects={"lineStyles": [{"properties": {"lineChartType": lit("'linear'")}}]})
-    p.add("clusteredColumnChart", 660, 584, 620, 472,
-          title="Days between requests (red = within the 120-day frequent window)",
-          roles={"Category": [col("GapBuckets", "Bucket")], "Y": [meas("Requests in Gap Bucket")]},
+    p.add("clusteredColumnChart", 916, 580, 484, 476, title="Requests by month of the year (all years together)",
+          roles={"Category": [col("DimDate", "Month")], "Y": [meas("Total Requests")]})
+    p.add("clusteredColumnChart", 1412, 580, 484, 476, title="Shortest gap between a person's computers, in days",
+          roles={"Category": [col("GapBuckets", "Bucket")], "Y": [meas("People in Gap Bucket")]},
           objects={"dataPoint": [{"properties": {"fill": measure_color("Gap Bucket Color")},
                                   "selector": {"data": [{"dataViewWildcard": {"matchingOption": 1}}]}}]},
           sort=(col("GapBuckets", "Bucket"), "Ascending"))
-    p.table(1296, 584, 600, 230, [(col("Requests", "Requester Name"), 1), (col("Requests", "Computer Provided To"), 1),
-                                  (col("Requests", "Created Date"), 1), (col("Requests", "Outcome"), 1)],
-            title="Devices given to someone else (non-technicians)",
-            filters=[equals_filter("Requests", "Recipient Differs From Requester", "Yes"),
-                     equals_filter("Requests", "Requester Is Technician", "No")], objects=OUTCOME_FONT)
-    p.table(1296, 826, 600, 230, [(col("Requests", "PC Serial Number"), 6), (col("Requests", "Created Date"), 5),
-                                  (col("Requests", "Ticket ID"), 4), (col("Requests", "Computer Provided To"), 6),
-                                  (col("Requests", "Outcome"), 5)],
-            title="Same serial seen before",
-            filters=[equals_filter("Requests", "Same Serial Seen Before", "Yes")], objects=OUTCOME_FONT)
     return p
 
 
 def ticket_detail() -> Page:
-    p = Page(*PAGES[3])
+    p = Page("TicketDetail", PAGE_TITLES["TicketDetail"])
     p.header()
-    for i, (name, label) in enumerate((("Needs Review", "Outcome needs review"), ("Match Needs Review", "Match needs review"),
-                                       ("Certificates Missing", "Certificates missing"))):
+    for i, (name, label) in enumerate((("Waiting for Confirmation", "Waiting for confirmation"),
+                                       ("Needs Review", "Outcome needs review"),
+                                       ("Certificates Missing", "Certificates missing"),
+                                       ("Serial Mismatches", "Serial mismatches"))):
         p.card(name, 24 + i * 316, 128, 300, 100, font=28, title=label)
-    p.card("Refresh Health", 972, 128, 460, 100, font=16, font_color=WHITE, title="Refresh health",
+    p.card("Refresh Health", 1288, 128, 608, 100, font=16, font_color=WHITE, title="Refresh health",
            vc={"background": [{"properties": {"show": lit("true"), "color": measure_color("Refresh Health Color"),
                                               "transparency": lit("0D")}}]})
-    p.card("Hours Since Last Success", 1448, 128, 448, 100, font=28, title="Hours since last successful extract")
     # Key columns only, so nothing scrolls sideways; every column is in the Excel workbook.
-    detail = [("Ticket ID", 6), ("Created Date", 7), ("Requester Name", 9), ("Computer Provided To", 9), ("Department", 9),
-              ("Device Type", 6), ("PC Serial Number", 8), ("Outcome", 7), ("Outcome Source", 8), ("Outcome Evidence", 20),
-              ("Approver", 8), ("Decision Date", 7), ("Certificate Attached", 7), ("Same Serial Seen Before", 7),
-              ("Match Source", 6), ("Status", 6), ("Requester Is Technician", 7)]
-    p.table(24, 244, 1872, 420, [(col("Requests", c), wt) for c, wt in detail]
-            + [(named(col("Requests", "Ticket URL"), "Link"), 4)],
+    detail = [("Ticket ID", 5), ("Created Date", 7), ("Requester Name", 10), ("Computer Provided To", 10), ("Department", 6),
+              ("Recipient Source", 8), ("Model", 11), ("PC Serial Number", 8), ("Outcome", 7), ("Outcome Evidence", 16),
+              ("Certificate Attached", 6), ("Match Confidence", 7), ("Archived", 5)]
+    p.table(24, 244, 1872, 400, [(col("Requests", c), wt) for c, wt in detail]
+            + [(named(col("Requests", "Ticket URL"), "Link"), 3)],
             title="All requests (key columns; every column is in the Excel workbook)", url=True, objects=OUTCOME_FONT,
             sort=(col("Requests", "Created Date"), "Descending"))
-    worklists = [
-        ("Worklist: outcome needs review", [(col("Requests", "Ticket ID"), 2), (col("Requests", "Created Date"), 3),
-                                            (col("Requests", "Outcome Evidence"), 6)], ("Requests", "Outcome", "Needs Review")),
-        ("Worklist: match needs review", [(col("Requests", "Ticket ID"), 2), (col("Requests", "Subject"), 5),
-                                          (col("Requests", "Matched Phrase"), 4)], ("Requests", "Match Needs Review", "Yes")),
-        ("Worklist: certificate missing", [(col("Requests", "Ticket ID"), 2), (col("Requests", "Created Date"), 3),
-                                           (col("Requests", "Computer Provided To"), 4)],
-         ("Requests", "Certificate Missing", "Yes")),
-    ]
-    for i, (label, columns, flt) in enumerate(worklists):
-        p.table(24 + i * 372, 680, 364, 376, columns, title=label, filters=[equals_filter(*flt)])
-    p.table(1140, 680, 364, 376, [(col("FormAnswers", "Field"), 4), (col("FormAnswers", "Value"), 5)],
-            title="Form answers (select a ticket above)")
-    p.table(1512, 680, 384, 376, [(col("RunLog", "Run"), 2), (col("RunLog", "Finished (Local)"), 5), (col("RunLog", "Mode"), 5),
-                                  (col("RunLog", "Status"), 4), (col("RunLog", "Message"), 7)],
-            title="Refresh log", sort=(col("RunLog", "Run"), "Descending"))
+    p.table(24, 660, 800, 396, [(col("Unconfirmed", "Ticket ID"), 4), (col("Unconfirmed", "Created Date"), 5),
+                                (col("Unconfirmed", "Subject"), 10), (col("Unconfirmed", "Confidence"), 5),
+                                (col("Unconfirmed", "Evidence"), 12), (named(col("Unconfirmed", "Ticket URL"), "Link"), 2)],
+            title="Waiting for confirmation (not counted until someone answers yes or no)", url=True,
+            sort=(col("Unconfirmed", "Created Date"), "Descending"))
+    p.table(836, 660, 356, 396, [(col("Requests", "Ticket ID"), 2), (col("Requests", "Created Date"), 3),
+                                 (col("Requests", "Outcome Evidence"), 6)],
+            title="Outcome needs review", filters=[equals_filter("Requests", "Outcome", "Needs Review")])
+    p.table(1204, 660, 316, 396, [(col("Requests", "Ticket ID"), 2), (col("Requests", "Created Date"), 3),
+                                  (col("Requests", "Computer Provided To"), 4)],
+            title="Certificate missing", filters=[equals_filter("Requests", "Certificate Missing", "Yes")])
+    p.table(1532, 660, 364, 396, [(named(col("RunLog", "Finished (Local)"), "Finished"), 5), (col("RunLog", "Status"), 4),
+                                  (col("RunLog", "Message"), 9)],
+            title="Refresh log", sort=(col("RunLog", "Finished (Local)"), "Descending"))
     return p
 
 
@@ -352,7 +381,7 @@ def main() -> int:
             BACKUP_DIR.mkdir(parents=True, exist_ok=True)
             shutil.move(str(folder), str(BACKUP_DIR / folder.name))
             print(f"Backed up existing page '{folder.name}' to {BACKUP_DIR}")
-    for page in (request_lookup(), overview(), frequent_patterns(), ticket_detail()):
+    for page in (overview(), request_lookup(), frequent_patterns(), ticket_detail()):
         page_dir = PAGES_DIR / page.name
         if page_dir.exists():
             shutil.rmtree(page_dir)  # generated by this script on a previous run

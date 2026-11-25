@@ -2,15 +2,15 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "freque09",
   "position": {
-    "x": 24,
-    "y": 584,
+    "x": 916,
+    "y": 580,
     "z": 9,
-    "height": 472,
-    "width": 620,
+    "height": 476,
+    "width": 484,
     "tabOrder": 9
   },
   "visual": {
-    "visualType": "lineChart",
+    "visualType": "clusteredColumnChart",
     "query": {
       "queryState": {
         "Category": {
@@ -31,24 +31,6 @@
             }
           ]
         },
-        "Series": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "DimDate"
-                    }
-                  },
-                  "Property": "Year"
-                }
-              },
-              "queryRef": "DimDate.Year",
-              "nativeQueryRef": "Year"
-            }
-          ]
-        },
         "Y": {
           "projections": [
             {
@@ -59,30 +41,15 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Share of Year %"
+                  "Property": "Total Requests"
                 }
               },
-              "queryRef": "_Measures.Share of Year %",
-              "nativeQueryRef": "Share of Year %"
+              "queryRef": "_Measures.Total Requests",
+              "nativeQueryRef": "Total Requests"
             }
           ]
         }
       }
-    },
-    "objects": {
-      "lineStyles": [
-        {
-          "properties": {
-            "lineChartType": {
-              "expr": {
-                "Literal": {
-                  "Value": "'linear'"
-                }
-              }
-            }
-          }
-        }
-      ]
     },
     "visualContainerObjects": {
       "title": [
@@ -98,7 +65,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Share of each year''s requests by month (Nov-Jan = holiday season)'"
+                  "Value": "'Requests by month of the year (all years together)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -111,7 +91,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Share of each year''s requests by month (Nov-Jan = holiday season)'"
+                  "Value": "'Requests by month of the year (all years together)'"
                 }
               }
             }

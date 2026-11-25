@@ -6,7 +6,7 @@
     "y": 128,
     "z": 10,
     "height": 100,
-    "width": 460,
+    "width": 300,
     "tabOrder": 10
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Refresh Health"
+                  "Property": "Serial Mismatches"
                 }
               },
-              "queryRef": "_Measures.Refresh Health",
-              "nativeQueryRef": "Refresh Health"
+              "queryRef": "_Measures.Serial Mismatches",
+              "nativeQueryRef": "Serial Mismatches"
             }
           ]
         }
@@ -40,18 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "16D"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#FFFFFF'"
-                    }
-                  }
+                  "Value": "28D"
                 }
               }
             }
@@ -73,42 +62,6 @@
       ]
     },
     "visualContainerObjects": {
-      "background": [
-        {
-          "properties": {
-            "show": {
-              "expr": {
-                "Literal": {
-                  "Value": "true"
-                }
-              }
-            },
-            "color": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Measure": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "_Measures"
-                        }
-                      },
-                      "Property": "Refresh Health Color"
-                    }
-                  }
-                }
-              }
-            },
-            "transparency": {
-              "expr": {
-                "Literal": {
-                  "Value": "0D"
-                }
-              }
-            }
-          }
-        }
-      ],
       "title": [
         {
           "properties": {
@@ -122,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Refresh health'"
+                  "Value": "'Serial mismatches'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -135,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Refresh Health'"
+                  "Value": "'Serial Mismatches'"
                 }
               }
             }

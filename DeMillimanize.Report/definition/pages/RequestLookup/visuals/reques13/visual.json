@@ -5,7 +5,7 @@
     "x": 648,
     "y": 236,
     "z": 13,
-    "height": 560,
+    "height": 760,
     "width": 1248,
     "tabOrder": 13
   },
@@ -93,25 +93,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Device Type"
+                  "Property": "Model"
                 }
               },
-              "queryRef": "Requests.Device Type",
-              "nativeQueryRef": "Device Type"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "PC Serial Number"
-                }
-              },
-              "queryRef": "Requests.PC Serial Number",
-              "nativeQueryRef": "PC Serial Number"
+              "queryRef": "Requests.Model",
+              "nativeQueryRef": "Model"
             },
             {
               "field": {
@@ -135,39 +121,12 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Approver"
-                }
-              },
-              "queryRef": "Requests.Approver",
-              "nativeQueryRef": "Approver"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Decision Date"
-                }
-              },
-              "queryRef": "Requests.Decision Date",
-              "nativeQueryRef": "Decision Date"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
                   "Property": "Days Since Previous (Recipient)"
                 }
               },
               "queryRef": "Requests.Days Since Previous (Recipient)",
-              "nativeQueryRef": "Days Since Previous (Recipient)"
+              "nativeQueryRef": "Days Since Previous (Recipient)",
+              "displayName": "Days since previous"
             },
             {
               "field": {
@@ -181,21 +140,8 @@
                 }
               },
               "queryRef": "Requests.Certificate Attached",
-              "nativeQueryRef": "Certificate Attached"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Outcome Evidence"
-                }
-              },
-              "queryRef": "Requests.Outcome Evidence",
-              "nativeQueryRef": "Outcome Evidence"
+              "nativeQueryRef": "Certificate Attached",
+              "displayName": "Certificate"
             },
             {
               "field": {
@@ -251,6 +197,13 @@
                   "Value": "false"
                 }
               }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
+                }
+              }
             }
           }
         }
@@ -269,6 +222,13 @@
               "expr": {
                 "Literal": {
                   "Value": "true"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "11D"
                 }
               }
             }
@@ -324,7 +284,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "82D"
+                  "Value": "115D"
                 }
               }
             }
@@ -338,7 +298,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "61D"
+                  "Value": "82D"
                 }
               }
             }
@@ -352,7 +312,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
+                  "Value": "98D"
                 }
               }
             }
@@ -366,7 +326,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "102D"
+                  "Value": "164D"
                 }
               }
             }
@@ -380,7 +340,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "102D"
+                  "Value": "164D"
                 }
               }
             }
@@ -394,13 +354,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
+                  "Value": "197D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Device Type"
+            "metadata": "Requests.Model"
           }
         },
         {
@@ -408,21 +368,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "92D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.PC Serial Number"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "82D"
+                  "Value": "115D"
                 }
               }
             }
@@ -436,35 +382,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "92D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Approver"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "82D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Decision Date"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "82D"
+                  "Value": "115D"
                 }
               }
             }
@@ -478,7 +396,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "72D"
+                  "Value": "98D"
                 }
               }
             }
@@ -492,21 +410,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "164D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Outcome Evidence"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "41D"
+                  "Value": "49D"
                 }
               }
             }
@@ -532,6 +436,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'Request history'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

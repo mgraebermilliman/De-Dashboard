@@ -11,13 +11,14 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["TMDLView_Desktop","DevMode"]
 
-annotation PBI_QueryOrder = ["Requests","People","PersonRequests","FormAnswers","RunLog","DimDate","GapBuckets","_Measures","WorkbookPath","Workbook"]
+annotation PBI_QueryOrder = ["Requests","People","PersonRequests","FormAnswers","RunLog","Unconfirmed","DimDate","GapBuckets","_Measures","WorkbookPath","Workbook"]
 
 ref table Requests
 ref table People
 ref table PersonRequests
 ref table FormAnswers
 ref table RunLog
+ref table Unconfirmed
 ref table DimDate
 ref table GapBuckets
 ref table _Measures

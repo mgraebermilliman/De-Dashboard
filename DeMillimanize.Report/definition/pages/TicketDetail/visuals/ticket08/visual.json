@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Match Needs Review"
+                  "Property": "Needs Review"
                 }
               },
-              "queryRef": "_Measures.Match Needs Review",
-              "nativeQueryRef": "Match Needs Review"
+              "queryRef": "_Measures.Needs Review",
+              "nativeQueryRef": "Needs Review"
             }
           ]
         }
@@ -75,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Match needs review'"
+                  "Value": "'Outcome needs review'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -88,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Match Needs Review'"
+                  "Value": "'Needs Review'"
                 }
               }
             }

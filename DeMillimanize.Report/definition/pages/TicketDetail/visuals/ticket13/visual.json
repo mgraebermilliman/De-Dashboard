@@ -3,10 +3,10 @@
   "name": "ticket13",
   "position": {
     "x": 24,
-    "y": 680,
+    "y": 660,
     "z": 13,
-    "height": 376,
-    "width": 364,
+    "height": 396,
+    "width": 800,
     "tabOrder": 13
   },
   "visual": {
@@ -20,13 +20,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "Unconfirmed"
                     }
                   },
                   "Property": "Ticket ID"
                 }
               },
-              "queryRef": "Requests.Ticket ID",
+              "queryRef": "Unconfirmed.Ticket ID",
               "nativeQueryRef": "Ticket ID"
             },
             {
@@ -34,13 +34,13 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "Unconfirmed"
                     }
                   },
                   "Property": "Created Date"
                 }
               },
-              "queryRef": "Requests.Created Date",
+              "queryRef": "Unconfirmed.Created Date",
               "nativeQueryRef": "Created Date"
             },
             {
@@ -48,17 +48,78 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "Requests"
+                      "Entity": "Unconfirmed"
                     }
                   },
-                  "Property": "Outcome Evidence"
+                  "Property": "Subject"
                 }
               },
-              "queryRef": "Requests.Outcome Evidence",
-              "nativeQueryRef": "Outcome Evidence"
+              "queryRef": "Unconfirmed.Subject",
+              "nativeQueryRef": "Subject"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Unconfirmed"
+                    }
+                  },
+                  "Property": "Confidence"
+                }
+              },
+              "queryRef": "Unconfirmed.Confidence",
+              "nativeQueryRef": "Confidence"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Unconfirmed"
+                    }
+                  },
+                  "Property": "Evidence"
+                }
+              },
+              "queryRef": "Unconfirmed.Evidence",
+              "nativeQueryRef": "Evidence"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Unconfirmed"
+                    }
+                  },
+                  "Property": "Ticket URL"
+                }
+              },
+              "queryRef": "Unconfirmed.Ticket URL",
+              "nativeQueryRef": "Ticket URL",
+              "displayName": "Link"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "Unconfirmed"
+                  }
+                },
+                "Property": "Created Date"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -91,6 +152,13 @@
                   "Value": "true"
                 }
               }
+            },
+            "urlIcon": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
             }
           }
         }
@@ -114,13 +182,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "58D"
+                  "Value": "79D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Ticket ID"
+            "metadata": "Unconfirmed.Ticket ID"
           }
         },
         {
@@ -128,13 +196,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "87D"
+                  "Value": "99D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Created Date"
+            "metadata": "Unconfirmed.Created Date"
           }
         },
         {
@@ -142,13 +210,55 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "174D"
+                  "Value": "198D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Outcome Evidence"
+            "metadata": "Unconfirmed.Subject"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "99D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Unconfirmed.Confidence"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "238D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Unconfirmed.Evidence"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "39D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Unconfirmed.Ticket URL"
           }
         }
       ]
@@ -167,7 +277,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Worklist: outcome needs review'"
+                  "Value": "'Waiting for confirmation (not counted until someone answers yes or no)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -180,7 +303,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Worklist: outcome needs review'"
+                  "Value": "'Waiting for confirmation (not counted until someone answers yes or no)'"
                 }
               }
             }
@@ -189,62 +312,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "f_Requests_Outcome",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "Requests"
-              }
-            },
-            "Property": "Outcome"
-          }
-        },
-        "type": "Categorical",
-        "filter": {
-          "Version": 2,
-          "From": [
-            {
-              "Name": "r",
-              "Entity": "Requests",
-              "Type": 0
-            }
-          ],
-          "Where": [
-            {
-              "Condition": {
-                "In": {
-                  "Expressions": [
-                    {
-                      "Column": {
-                        "Expression": {
-                          "SourceRef": {
-                            "Source": "r"
-                          }
-                        },
-                        "Property": "Outcome"
-                      }
-                    }
-                  ],
-                  "Values": [
-                    [
-                      {
-                        "Literal": {
-                          "Value": "'Needs Review'"
-                        }
-                      }
-                    ]
-                  ]
-                }
-              }
-            }
-          ]
-        }
-      }
-    ]
   }
 }

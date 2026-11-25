@@ -25,7 +25,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Request Lookup'"
+                  "Value": "'Overview'"
                 }
               }
             },
@@ -34,7 +34,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#12344D'"
+                      "Value": "'#FFFFFF'"
                     }
                   }
                 }
@@ -61,7 +61,7 @@
                 "color": {
                   "expr": {
                     "Literal": {
-                      "Value": "'#FFFFFF'"
+                      "Value": "'#00C1A0'"
                     }
                   }
                 }
@@ -102,7 +102,7 @@
             "navigationSection": {
               "expr": {
                 "Literal": {
-                  "Value": "'RequestLookup'"
+                  "Value": "'Overview'"
                 }
               }
             }
@@ -115,7 +115,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Go to Request Lookup'"
+                  "Value": "'Go to Overview'"
                 }
               }
             }

@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "overvi10",
   "position": {
-    "x": 24,
-    "y": 446,
+    "x": 1436,
+    "y": 128,
     "z": 10,
-    "height": 92,
-    "width": 300,
+    "height": 88,
+    "width": 460,
     "tabOrder": 10
   },
   "visual": {
@@ -72,6 +72,19 @@
             }
           }
         }
+      ],
+      "general": [
+        {
+          "properties": {
+            "selfFilterEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -88,7 +101,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Department'"
+                  "Value": "'Practice'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -101,7 +127,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Department'"
+                  "Value": "'Filter by Practice'"
                 }
               }
             }

@@ -1,4 +1,4 @@
-expression WorkbookPath = "O:\De-Dashboard\sample_data\DeMillimanize Requests.mock.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+expression WorkbookPath = "C:\Users\michael.graeber\Documents\GitHub\Test Repo\data\DeMillimanize Requests.xlsx" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
 	lineageTag: 5fe01740-7a82-4662-9cf5-10d5f2de7006
 
 	annotation PBI_ResultType = Text

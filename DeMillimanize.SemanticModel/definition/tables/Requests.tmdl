@@ -307,6 +307,123 @@ table Requests
 		summarizeBy: none
 		sourceColumn: Recipient Is Technician
 
+	column 'COD Erase Date'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Erase Date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'COD Erase Method'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Erase Method
+
+	column 'COD Erase Result'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Erase Result
+
+	column 'COD Erase Errors'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Erase Errors
+
+	column 'COD Motherboard'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Motherboard
+
+	column 'COD Processor'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Processor
+
+	column 'COD Memory'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Memory
+
+	column 'COD Drive Size'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Drive Size
+
+	column 'COD OS'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD OS
+
+	column 'COD BIOS'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD BIOS
+
+	column 'COD Device Serial'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Device Serial
+
+	column 'COD Serial Matches Ticket'
+		dataType: string
+		displayFolder: Certificate Details
+		summarizeBy: none
+		sourceColumn: COD Serial Matches Ticket
+
+	column Model
+		dataType: string
+		displayFolder: Device
+		summarizeBy: none
+		sourceColumn: Model
+
+	column 'Model Line'
+		dataType: string
+		displayFolder: Device
+		summarizeBy: none
+		sourceColumn: Model Line
+
+	column 'Model Source'
+		dataType: string
+		displayFolder: Device
+		summarizeBy: none
+		sourceColumn: Model Source
+
+	column 'Model Group'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Model Group
+		displayFolder: Device
+
+	column 'Match Confidence'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Match Confidence
+		displayFolder: Matching
+
+	column Archived
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Archived
+		displayFolder: Ticket
+
+	column 'Recipient Source'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Recipient Source
+		displayFolder: People
+
 	partition Requests = m
 		mode: import
 		source =
@@ -354,7 +471,26 @@ table Requests
 										{"Resolution Note", type text},
 										{"Last Updated", type datetime},
 										{"Requester Is Technician", type text},
-										{"Recipient Is Technician", type text}
+										{"Recipient Is Technician", type text},
+										{"COD Erase Date", type date},
+										{"COD Erase Method", type text},
+										{"COD Erase Result", type text},
+										{"COD Erase Errors", type text},
+										{"COD Motherboard", type text},
+										{"COD Processor", type text},
+										{"COD Memory", type text},
+										{"COD Drive Size", type text},
+										{"COD OS", type text},
+										{"COD BIOS", type text},
+										{"COD Device Serial", type text},
+										{"COD Serial Matches Ticket", type text},
+										{"Model", type text},
+										{"Model Line", type text},
+										{"Model Source", type text},
+										{"Model Group", type text},
+										{"Match Confidence", type text},
+										{"Archived", type text},
+										{"Recipient Source", type text}
 					}),
 					Rows = Table.SelectRows(Typed, each [Ticket ID] <> null)
 				in

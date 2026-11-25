@@ -47,6 +47,19 @@
           }
         }
       ],
+      "general": [
+        {
+          "properties": {
+            "selfFilterEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
       "header": [
         {
           "properties": {
@@ -101,7 +114,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Search a name'"
+                  "Value": "'Search a name (click, then start typing)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -114,7 +140,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Search box: choose a person to see their request history'"
+                  "Value": "'Search box: type a name and pick the person to see their request history'"
                 }
               }
             }

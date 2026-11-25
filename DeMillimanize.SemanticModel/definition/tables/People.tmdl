@@ -117,6 +117,12 @@ table People
 		summarizeBy: none
 		sourceColumn: Technician
 
+	column 'Last Received'
+		dataType: dateTime
+		formatString: mmm d, yyyy
+		summarizeBy: none
+		sourceColumn: Last Received
+
 	partition People = m
 		mode: import
 		source =
@@ -136,6 +142,7 @@ table People
 										{"Needs Review", Int64.Type},
 										{"First Request", type date},
 										{"Last Request", type date},
+										{"Last Received", type date},
 										{"Shortest Gap (Days)", Int64.Type},
 										{"Technician", type text}
 					}),

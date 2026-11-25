@@ -43,7 +43,7 @@ This guide covers how to build, publish and check the report. It follows the ori
 - A card showing `[Last Refreshed]` (no category label, white text, transparent background).
 - A card showing `[Mock Data Banner]` in red. It is blank on real data.
 
-**Sync slicers** (View > Sync slicers) across pages 2-4: Created Date, Outcome, Device Type, Department, Requester, Computer Provided To, Frequent, Match Source.
+**Sync slicers** (View > Sync slicers), optional: the Overview's year, Outcome, Model and Practice filters can be synced to the other pages. The generated pages don't sync them.
 
 **Outcome colors are the same on every visual.** Set them once per visual under *Data colors*:
 
@@ -58,58 +58,66 @@ For table cells, use *Conditional formatting > Background (or Font) color > Fiel
 
 **Accessibility:** Give every visual alt text that describes what it shows. Set tab order (View > Selection > Tab order) from top-left to bottom-right. Turn tooltips on for all charts.
 
-### Page 1: Request Lookup (landing page)
+### Page 1: Overview (home page)
+
+Opens first and is kept deliberately short, so the important numbers can be read at a glance. The filters across the top apply to every visual on the page.
 
 | Area | Visual | Fields and settings |
 |---|---|---|
-| Top, full width | **Slicer**, Dropdown, *Search* on, *Single select* on | `People[Person]`. Large font (16). Title: "Search a name" |
-| Under search | Card | `[Lookup Prompt]`. Hide the category label. Shows text only when nobody is selected |
-| Left, under search | Table "Frequent people" | `People[Person]`, `People[Last Request]`, `People[Shortest Gap (Days)]`. Visual filter: `People[Frequent] = Yes`. Sort by Last Request, descending. *Edit interactions:* the name slicer does **not** filter this table, so it always lists every frequent person |
-| Top right | Card (red, bold, white text) | `[Frequent Banner]`. Conditional background: rules on `People[Frequent]` = "Yes" → `#E5484D` |
-| Profile panel | Table "Profile" + multi-row card "Request counts" | Table: `People[Person]`, `Email`, `Department`, `Technician`, `Frequent` (a table, so long emails wrap instead of being cut off). Card: `Requests Made`, `Requests Made For Others`, `Times Named As Recipient`, `Approved`, `Denied`, `Pending`, `Needs Review`, `First Request`, `Last Request`, `Shortest Gap (Days)`, renamed to short labels so they aren't cut off |
-| Main area | Table "Request history" | `Requests[Created Date]` (sort descending), `Requests[Ticket ID]`, `PersonRequests[Role]`, `Requests[Requester Name]`, `Requests[Computer Provided To]`, `Requests[Device Type]`, `Requests[PC Serial Number]`, `Requests[Outcome]`, `Requests[Approver]`, `Requests[Decision Date]`, `Requests[Days Since Previous (Recipient)]`, `Requests[Certificate Attached]`, `Requests[Outcome Evidence]`, `Requests[Ticket URL]` (shown as a link icon). Word wrap on, fixed column widths, so nothing scrolls sideways. **Don't add a measure** to this table: Power BI hides rows where every measure is blank, which hid all of a technician's rows |
-| | | **Ticket link:** *Cell elements > Ticket ID > Web URL > Field value = `Requests[Ticket URL]`*. The ticket number becomes a clickable link. |
-| | | **Outcome color:** background color from `[Outcome Color]` (field value) |
-| | | **Certificate icon:** *Icons > Rules* on `[Certificate Flag]`: 1 = green check, 0 = red cross |
+| Top row | 4 filters | A **year dropdown** on `DimDate[Year]` (titled "Created date: all time, or pick a year"; "Select all" or nothing ticked is all time, then 2026, 2025, 2024, 2023, and several years can be ticked), `Requests[Outcome]`, `Requests[Model Line]` (titled "Model"), `Requests[Department]` (titled "Practice"). The three other dropdowns have *Search* on |
+| Second row | 5 cards | `[Total Requests]`, `[Approved]`, `[Needs Review]`, `[Frequent People]`, `[Latest Request]` |
+| Middle left | Stacked column chart "Requests by month" | X `DimDate[Month Start]`, columns `[Requests by Period]`, Legend `Requests[Outcome]`. Leave the X-axis type at its default: Power BI then draws a date axis with year labels. Forcing *Categorical* (or setting *Continuous* in the generated file) gave 46 overlapping month labels once the data reached back to 2021 |
+| Middle right | **Pie** "Models" | Legend `Requests[Model Group]`, Values `[Total Requests]`, labels show percent of total |
+| Bottom left | Bar "Requests by recipient's practice" | `Requests[Department]`, `[Total Requests]`. A technician-listed ticket (the technician is the recipient) counts under the technician's practice, mostly CMH, which the chart title says |
+| Bottom middle | Table "Frequent: computer provided to, under 120 days apart" | `People[Person]`, `Times Named As Recipient` (titled "Computers"), `Last Received`, `Shortest Gap (Days)`, `Technician`. Sorted by Last Received, newest first. Visual filter `People[Frequent] = Yes`. It lists everyone flagged Frequent whatever the filters say, and is empty when nobody has repeated within 120 days |
+| Bottom right | Table "Most recent requests" | `Requests[Created Date]` (newest first), `Computer Provided To`, `Model`, `Outcome`, ticket link |
+
+**Models:** `Requests[Model]` is the ticket's typed make/model tidied into one spelling (`lenovo t14s` and `Lenovo ThinkPad T14s Gen 2i` become `ThinkPad T14s` and `ThinkPad T14s Gen 2`). `Model Line` drops the generation. When the form has no usable model, the model comes from the old PC name (`MILWI-T15-JF` is a ThinkPad T15; read from the form and from the certificate's file name), then from other tickets with the same Lenovo machine type if they all agree (`Model Source` says which). `Model Group` names a model line separately when it has 10 or more requests and otherwise joins its family ("Other ThinkPad", "Other ThinkCentre", "Dell", "Surface", "HP EliteBook", "Other models"), so the pie has about 13 slices. A ticket with no model at all is "Not identified". Nothing is guessed.
+
+**Only sure requests are counted.** Tickets waiting for a yes/no (the `Unconfirmed` table) aren't in any number on this page. They're listed on page 4.
+
+### Page 2: Request Lookup
+
+| Area | Visual | Fields and settings |
+|---|---|---|
+| Top left | **Slicer**, Dropdown, *Search* on, *Single select* on | `People[Person]`. Title: "Search a name (click, then start typing)". Clicking opens a search box; typing narrows the list to matching names |
+| Next to search | Card | `[Lookup Prompt]`. Hide the category label |
+| Top right | Card (red text) | `[Frequent Banner]` |
+| Left | Table "Profile" + multi-row card "Request counts" | Table: `People[Person]`, `Email`, `Department`, `Technician`, `Frequent`. Card: `Requests Made`, `Requests Made For Others`, `Times Named As Recipient`, `Approved`, `Denied`, `Pending`, `Needs Review`, `First Request`, `Last Request`, `Shortest Gap (Days)`, renamed to short labels so they aren't cut off |
+| Bottom left | Table "Frequent people" | `People[Person]`, `People[Last Received]`, `People[Shortest Gap (Days)]`. Visual filter: `People[Frequent] = Yes`. *Edit interactions:* the name slicer does **not** filter this table, so it always lists every frequent person |
+| Right | Table "Request history" | `Requests[Created Date]` (newest first), `Ticket ID`, `PersonRequests[Role]`, `Requester Name`, `Computer Provided To`, `Model`, `Outcome` (colored by `[Outcome Color]`), `Days Since Previous (Recipient)`, `Certificate Attached`, `Ticket URL` (link icon). Word wrap on, fixed column widths, so nothing scrolls sideways. **Don't add a measure** to this table: Power BI hides rows where every measure is blank, which hid all of a technician's rows |
 | Under the table | Card | `[No History Message]` |
-| Bottom | **Scatter chart** "Timeline" | X axis `Requests[Created Date]` summarized as **Earliest** (a scatter chart needs a summarized X when Values is used), Y axis `[Timeline Y]`, Legend `Requests[Outcome]`, Values `Requests[Ticket ID]`. Hide the Y axis, marker size 12 |
 
 Searching finds a person **both as requester and as recipient** because the slicer is on `People` and filters `Requests` through `PersonRequests`. Technicians appear under Role "Requester" on forms they filed for others. The profile counts (Approved, Denied, etc.) only cover requests where the person is the one receiving the device.
 
-### Page 2: Overview
-
-| Visual | Fields and settings |
-|---|---|
-| 7 KPI cards (top row) | `[Total Requests]`, `[Approved]`, `[Denied]`, `[Pending]`, `[Needs Review]`, `[Approval Rate %]`, `[Frequent People]` |
-| **Line and stacked column chart** "Requests by month" | X `DimDate[Month Start]` (Continuous off, so it's categorical). Columns `[Total Requests]` with Legend `Requests[Outcome]`. Line `[Requests Same Period Last Year]` (dashed, gray). Second line `[Holiday Band]`: light teal, *Shade area* on, transparency 85%, markers off. This shades November to January. Tooltips: `[Requests MoM Change]`, `[Requests YoY Change %]` |
-| Donut "Outcome share" | Legend `Requests[Outcome]`, Values `[Total Requests]` |
-| Bar "By device type" | `Requests[Device Type]`, `[Total Requests]` |
-| Bar "Top 10 departments" | `Requests[Department]`, `[Total Requests]`. Filter: Top N 10 by Total Requests |
-| Bar "By approver" | `Requests[Approver]`, `[Total Requests]`, Legend `Requests[Outcome]` |
-| Slicers (left column, synced) | `DimDate[Date]` (Between), `Requests[Outcome]`, `Requests[Device Type]`, `Requests[Department]`, `Requests[Requester Name]`, `Requests[Computer Provided To]`, `People[Frequent]`, `Requests[Match Source]` |
+The earlier "Timeline" scatter chart was removed on 2026-11-24. It showed an error ("This aggregate is not supported for the x-axis field"), and the history table already gives the dates.
 
 ### Page 3: Frequent and Patterns
 
 | Visual | Fields and settings |
 |---|---|
-| Table "People ranked" | `People[Person]`, `Requests Made`, `Requests Made For Others`, `Times Named As Recipient`, `Approved`, `Denied`, `Last Request`, `Shortest Gap (Days)`, `Frequent`, `Technician`. Sort by Shortest Gap ascending. Background red `#E5484D` with white font when Frequent = "Yes". **Data bars** on the count columns |
-| **Matrix** "Heatmap" | Rows `DimDate[Year]`, Columns `DimDate[Month]`, Values `[Total Requests]`. Background color scale: min `#F5F7F9`, max `#E5484D` |
-| Line chart "Share of each year by month" | X `DimDate[Month]`, Legend `DimDate[Year]`, Y `[Share of Year %]`. Add `[All-Years Share of Month %]` as a dark navy dashed line (use *Secondary Y* off). Holiday months are visible on the axis. Add a constant-line note "Nov-Jan = holiday season" |
-| Column chart "Days between requests" | X `GapBuckets[Bucket]`, Y `[Requests in Gap Bucket]`. Conditional column color: rules on `GapBuckets[Within 120 Days]`, Yes = `#E5484D`, No = `#8A96A3`. Title: "Days between requests (red = within 120-day frequent window)" |
-| Table "Devices given to someone else" | `Requests[Requester Name]`, `[Requests Made For Others]`, `Requests[Computer Provided To]`. Filters: `Recipient Differs From Requester = Yes` and **`Requester Is Technician = No`**, because technicians file forms for others as part of their job |
-| Table "Same serial seen before" | `Requests[PC Serial Number]`, `Created Date`, `Ticket ID` (Web URL link), `Computer Provided To`, `Outcome`. Filter: `Same Serial Seen Before = Yes` |
-| Card | `[Technician-Listed Requests]`, titled "Technician-listed (possible charity)" |
+| **Matrix** "Requests by month and year" (full width, large text) | Rows `DimDate[Year]`, Columns `DimDate[Month]`, Values `[Total Requests]`. Cell background from `[Heatmap Color]` (field value): white for 0, then four teal steps up to the busiest month shown. Totals stay white |
+| Table "People named as recipient more than once" | `People[Person]`, `Times Named As Recipient` (titled "Computers received"), `Last Received`, `Shortest Gap (Days)`, `Frequent`, `Technician`. Visual filter: `Shortest Gap (Days)` is not blank. Sorted by shortest gap. The name is red when Frequent = "Yes" (`[Frequent Color]`) |
+| Column chart "Requests by month of the year" | X `DimDate[Month]`, Y `[Total Requests]`, all years together. Shows the holiday-season pattern |
+| Column chart "Shortest gap between a person's computers, in days" | X `GapBuckets[Bucket]`, Y `[People in Gap Bucket]`. Column color from `[Gap Bucket Color]`: red within the 120-day window, gray otherwise |
 
-The histogram uses each request's recipient gap, or its requester gap when there's no recipient. Requester-only gaps would hide most form tickets, because technicians are usually the requester and are excluded.
+`[People in Gap Bucket]` counts people by `People[Shortest Gap (Days)]`, the shortest gap between two tickets that name the person as the recipient. It matches the "Frequent people" card, and technicians are included. The older `[Requests in Gap Bucket]` measure only saw gaps within one role and is no longer on a page.
+
+The "Devices given to someone else" and "Same serial seen before" tables were removed on 2026-11-24 (Michael). Their columns and measures are still in the model.
 
 ### Page 4: Ticket Detail and Data Quality
 
 | Visual | Fields and settings |
 |---|---|
-| Table "All requests" | Key `Requests` columns that fit the page width without side scrolling (Ticket ID, Created Date, Requester, Recipient, Department, Device Type, Serial, Outcome, Outcome Source, Outcome Evidence, Approver, Decision Date, Certificate Attached, Same Serial Seen Before, Match Source, Status, Requester Is Technician, ticket link). Every column is in the Excel workbook. *Format > Visual header* on, so users can export (... > Export data) |
-| 3 worklist cards + tables | `[Needs Review]` with a table filtered to `Outcome = Needs Review` (Ticket ID, Created Date, Outcome Evidence). `[Match Needs Review]` with a table filtered to `Match Needs Review = Yes` (Ticket ID, Subject, Matched Phrase, Matched Field). `[Certificates Missing]` with a table filtered to `Certificate Missing = Yes` |
-| Table "Form answers" | `FormAnswers[Field]`, `FormAnswers[Value]`. It shows the raw form for the selected ticket |
-| Refresh health | Card `[Refresh Health]` with background color field value `[Refresh Health Color]`. Card `[Hours Since Last Success]`. Table of `RunLog` (Run, Finished (Local), Mode, Status, Message), sorted by Run descending. The other RunLog columns are in the Excel workbook |
+| 4 cards | `[Waiting for Confirmation]`, `[Needs Review]`, `[Certificates Missing]`, `[Serial Mismatches]` |
+| Refresh health | Card `[Refresh Health]` with background color field value `[Refresh Health Color]` |
+| Table "All requests" | Key `Requests` columns that fit the page width without side scrolling (Ticket ID, Created Date, Requester, Recipient, Department, Recipient Source, Model, Serial, Outcome, Outcome Evidence, Certificate Attached, Match Confidence, Archived, ticket link). Every column is in the Excel workbook. *Format > Visual header* on, so users can export (... > Export data) |
+| Table "Waiting for confirmation" | From the `Unconfirmed` table: Ticket ID, Created Date, Subject, Confidence, Evidence, ticket link. To clear a row, add the ticket to `data\match_confirmations.csv` with Yes or No and run the extract |
+| Table "Outcome needs review" | Filtered to `Outcome = Needs Review` (Ticket ID, Created Date, Outcome Evidence) |
+| Table "Certificate missing" | Filtered to `Certificate Missing = Yes` (Ticket ID, Created Date, Computer Provided To) |
+| Table "Refresh log" | `RunLog` (Finished (Local), Status, Message), newest first. The other RunLog columns are in the Excel workbook |
+
+The raw "Form answers" table and the "Hours since last successful extract" card were removed from the page on 2026-11-24 to cut clutter. `FormAnswers` and `[Hours Since Last Success]` are still in the model.
 
 **Drill-through:** On page 4, add `Requests[Ticket ID]` and `People[Person]` to the *Drill through* well, with *Keep all filters* on. Right-clicking a ticket or person on any page then gives *Drill through > Ticket Detail*.
 
@@ -135,7 +143,8 @@ The histogram uses each request's recipient gap, or its requester gap when there
 
 Tick each item and record the date in OVERVIEW.md.
 
-- [ ] The row counts in Power BI match the workbook for every table: Requests, People, PersonRequests, FormAnswers and RunLog. Use a card with `COUNTROWS`, or Excel's table row count.
+- [ ] The row counts in Power BI match the workbook for every table: Requests, People, PersonRequests, FormAnswers, Unconfirmed and RunLog. Use a card with `COUNTROWS`, or Excel's table row count.
+- [ ] With mock data, the Data Quality page shows 1 ticket waiting for confirmation ("Remote restart"), and it isn't counted in Total requests.
 - [ ] With mock data, searching **Jane Example** shows 3 requests (Role = Recipient), the **FREQUENT** banner, and a shortest gap of 99 days.
 - [ ] With mock data, searching **Alex Tech** shows the forms he filed (Role = Requester) and Technician = Yes. He is **not** flagged as Frequent.
 - [ ] A real person known to have requested before shows every ticket, both as requester and as recipient, and the ticket links open the right Freshservice tickets.
@@ -152,7 +161,7 @@ Tick each item and record the date in OVERVIEW.md.
 
 1. The final SharePoint site, library and folder for the workbook, and how the extract machine writes to it (OneDrive sync or upload).
 2. Ticket links use `https://milliman-helpdesk.freshservice.com/a/tickets/<id>`. Should they use the `hd.milliman.com` portal instead? Change this with `DEDASH_TICKET_URL_BASE`.
-3. **Department** is the **practice code from Active Directory** (for example `CMH`), found by email using SPARK's method. Freshservice department reads return 403 with our key. Requests[Department] is the practice of the person receiving the device; if that's unknown, it falls back to the ticket's Freshservice department. People[Department] is each person's own AD practice.
+3. **Department** is the **department on the person's own Freshservice account**, with the short name from SPARK's table where there is one (`CMH`, `EBC`). This needs a Freshservice key that can read requester records (Michael's can; Kevin's could not). Requests[Department] is the practice of the person receiving the device, and "Not recorded" when that person has none or no receiver is known. There is no fallback to the ticket's own department. People[Department] is each person's own account department.
 4. Status names come from Freshservice ticket fields. If those can't be read, the documented defaults are used: 2 Open, 3 Pending, 4 Resolved, 5 Closed.
 5. The approvals API path `/tickets/{id}/approvals` and its fields haven't been seen on this account yet. Run the probe to confirm them.
 6. Whether archived tickets are returned by the ticket list API.

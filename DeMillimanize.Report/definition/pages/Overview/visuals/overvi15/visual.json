@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "overvi15",
   "position": {
-    "x": 340,
-    "y": 128,
+    "x": 1528,
+    "y": 228,
     "z": 15,
-    "height": 110,
-    "width": 215,
+    "height": 124,
+    "width": 368,
     "tabOrder": 15
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Total Requests"
+                  "Property": "Latest Request"
                 }
               },
-              "queryRef": "_Measures.Total Requests",
-              "nativeQueryRef": "Total Requests"
+              "queryRef": "_Measures.Latest Request",
+              "nativeQueryRef": "Latest Request"
             }
           ]
         }
@@ -40,7 +40,7 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "28D"
+                  "Value": "24D"
                 }
               }
             }
@@ -75,7 +75,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total Requests'"
+                  "Value": "'Most recent request'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -88,7 +101,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Total Requests'"
+                  "Value": "'Latest Request'"
                 }
               }
             }

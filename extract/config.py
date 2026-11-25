@@ -15,6 +15,14 @@ DATA_DIR = Path(os.environ.get("DEDASH_DATA_DIR", PROJECT_ROOT / "data"))
 WORKBOOK_PATH = DATA_DIR / "DeMillimanize Requests.xlsx"
 STATE_DIR = DATA_DIR / "state"
 OVERRIDES_PATH = DATA_DIR / "outcome_overrides.csv"
+# A person's yes/no on tickets the wording rules weren't sure about. Each ticket only needs confirming once.
+CONFIRMATIONS_PATH = DATA_DIR / "match_confirmations.csv"
+# Archived list pages take about 12 seconds each; a few at a time stays far below the 140-a-minute limit.
+ARCHIVE_WORKERS = max(1, min(int(os.environ.get("DEDASH_ARCHIVE_WORKERS", "4")), 6))
+# Tickets created before this date aren't relevant and are left out of the workbook (Michael, 2026-11-25).
+DATA_START = os.environ.get("DEDASH_DATA_START", "2023-07-01").strip() or None
+# A new archive scan starts at tickets created on or after this date. Blank = scan everything.
+ARCHIVE_SINCE = os.environ.get("DEDASH_ARCHIVE_SINCE", DATA_START or "").strip() or None
 
 
 def get_api_key() -> str:

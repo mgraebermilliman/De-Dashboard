@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "ticket11",
   "position": {
-    "x": 1448,
+    "x": 1288,
     "y": 128,
     "z": 11,
     "height": 100,
-    "width": 448,
+    "width": 608,
     "tabOrder": 11
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Hours Since Last Success"
+                  "Property": "Refresh Health"
                 }
               },
-              "queryRef": "_Measures.Hours Since Last Success",
-              "nativeQueryRef": "Hours Since Last Success"
+              "queryRef": "_Measures.Refresh Health",
+              "nativeQueryRef": "Refresh Health"
             }
           ]
         }
@@ -40,7 +40,18 @@
             "fontSize": {
               "expr": {
                 "Literal": {
-                  "Value": "28D"
+                  "Value": "16D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
                 }
               }
             }
@@ -62,6 +73,42 @@
       ]
     },
     "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "_Measures"
+                        }
+                      },
+                      "Property": "Refresh Health Color"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
       "title": [
         {
           "properties": {
@@ -75,7 +122,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Hours since last successful extract'"
+                  "Value": "'Refresh health'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -88,7 +148,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Hours Since Last Success'"
+                  "Value": "'Refresh Health'"
                 }
               }
             }

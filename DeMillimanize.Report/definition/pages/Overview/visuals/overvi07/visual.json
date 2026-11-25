@@ -5,8 +5,8 @@
     "x": 24,
     "y": 128,
     "z": 7,
-    "height": 110,
-    "width": 300,
+    "height": 88,
+    "width": 456,
     "tabOrder": 7
   },
   "visual": {
@@ -23,14 +23,32 @@
                       "Entity": "DimDate"
                     }
                   },
-                  "Property": "Date"
+                  "Property": "Year"
                 }
               },
-              "queryRef": "DimDate.Date",
-              "nativeQueryRef": "Date"
+              "queryRef": "DimDate.Year",
+              "nativeQueryRef": "Year"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DimDate"
+                  }
+                },
+                "Property": "Year"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -40,7 +58,7 @@
             "mode": {
               "expr": {
                 "Literal": {
-                  "Value": "'Between'"
+                  "Value": "'Dropdown'"
                 }
               }
             }
@@ -54,6 +72,26 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "selection": [
+        {
+          "properties": {
+            "strictSingleSelect": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "selectAllCheckboxEnabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
                 }
               }
             }
@@ -75,7 +113,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Created date'"
+                  "Value": "'Created date: all time, or pick a year'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -88,7 +139,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Filter by Created date'"
+                  "Value": "'Filter by Created date: all time, or pick a year'"
                 }
               }
             }

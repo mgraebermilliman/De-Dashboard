@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "freque10",
   "position": {
-    "x": 660,
-    "y": 584,
+    "x": 1412,
+    "y": 580,
     "z": 10,
-    "height": 472,
-    "width": 620,
+    "height": 476,
+    "width": 484,
     "tabOrder": 10
   },
   "visual": {
@@ -41,11 +41,11 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Requests in Gap Bucket"
+                  "Property": "People in Gap Bucket"
                 }
               },
-              "queryRef": "_Measures.Requests in Gap Bucket",
-              "nativeQueryRef": "Requests in Gap Bucket"
+              "queryRef": "_Measures.People in Gap Bucket",
+              "nativeQueryRef": "People in Gap Bucket"
             }
           ]
         }
@@ -116,7 +116,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Days between requests (red = within the 120-day frequent window)'"
+                  "Value": "'Shortest gap between a person''s computers, in days'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -129,7 +142,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Days between requests (red = within the 120-day frequent window)'"
+                  "Value": "'Shortest gap between a person''s computers, in days'"
                 }
               }
             }

@@ -9,6 +9,7 @@ import re
 from datetime import datetime, timezone
 
 from . import classify as c
+from . import cod
 from .freshservice import FreshserviceClient, FreshserviceError
 from .practices import DEPARTMENT_NAMES
 
@@ -36,8 +37,11 @@ def _full_name(record: dict) -> str | None:
 
 
 class Fetcher:
-    def __init__(self, client: FreshserviceClient):
+    def __init__(self, client: FreshserviceClient, cod_cache: dict | None = None):
         self.client = client
+        # Parsed certificate details by attachment id, so each certificate is downloaded once.
+        self.cod_cache: dict[str, dict] = cod_cache if cod_cache is not None else {}
+        self._cod_unavailable = False
         self._messages: list[str] = []
         self._failures: dict[str, tuple[int, str]] = {}
         self._forbidden: set[str] = set()
@@ -107,6 +111,11 @@ class Fetcher:
     def list_tickets(self, updated_since: str):
         yield from self.client.get_all("tickets", "tickets", {"updated_since": updated_since})
 
+    def archived_page(self, page: int) -> list[dict]:
+        """One page of archived tickets, oldest first. Subjects only: this list has no description."""
+        body = self.client.get("tickets", {"filter": "archived", "order_type": "asc", "per_page": 100, "page": page})
+        return body.get("tickets", [])
+
     # ---- lookups ------------------------------------------------------------
     def department_name(self, department_id) -> str | None:
         if not department_id:
@@ -142,6 +151,29 @@ class Fetcher:
                     record = found[0]
                     break
             self._users[key] = self._person(record) if record else None
+        return self._users[key]
+
+    def person_by_name(self, name: str) -> dict | None:
+        """The one employee or technician with this full name, or None when nobody or more than one matches.
+
+        Freshservice searches first and last name, so a middle name is tried both ways. A name with a quote in it
+        is skipped rather than put into a search query.
+        """
+        parts = name.split()
+        key = ("name", " ".join(parts).lower())
+        if key not in self._users:
+            found: list[dict] = []
+            if len(parts) >= 2 and not re.search(r"[\'\"\\]", name):
+                splits = [(parts[0], " ".join(parts[1:]))]
+                if len(parts) > 2:
+                    splits.append((" ".join(parts[:-1]), parts[-1]))
+                for first, last in splits:
+                    query = f"\"first_name:'{first}' AND last_name:'{last}'\""
+                    for path in ("requesters", "agents"):
+                        found += (self._try_get(f"{path} by name", path, {"query": query}) or {}).get(path) or []
+                    if found:
+                        break
+            self._users[key] = self._person(found[0]) if len(found) == 1 else None
         return self._users[key]
 
     def _person(self, record: dict) -> dict:
@@ -187,8 +219,11 @@ class Fetcher:
         if not approvals and ticket_approval in ("approved", "rejected"):
             approvals = [{"status": ticket_approval, "approver": None, "decided_at": None}]
         # The certificate is attached to the form item, not the ticket (probe, 2026-11-20).
-        attachments = [a.get("name") for a in t.get("attachments") or [] if a.get("name")]
-        attachments += [n for i in items for n in i["attachments"]]
+        files = [{"id": a.get("id"), "name": a.get("name"), "url": a.get("attachment_url")}
+                 for a in t.get("attachments") or []]
+        files += [f for i in items for f in i.pop("files")]
+        attachments = [f["name"] for f in files if f["name"]]
+        certificate_details = self.certificate_details(files)
         return {
             "id": ticket_id,
             "type": t.get("type"),
@@ -196,6 +231,7 @@ class Fetcher:
             "description_text": t.get("description_text"),
             "status": self.statuses.get(status_code),
             "status_code": status_code,
+            "archived": bool(t.get("archived")),
             "created_at": local_iso(t.get("created_at")),
             "updated_at": local_iso(t.get("updated_at")),
             "closed_at": local_iso((t.get("stats") or {}).get("closed_at")),
@@ -209,6 +245,7 @@ class Fetcher:
             "approvals": approvals,
             "notes": self._notes(ticket_id),
             "attachments": attachments,
+            "cod": certificate_details,
             "resolution_note": t.get("resolution_notes") or next(
                 (str(v) for k, v in custom.items() if "resolution" in k.lower() and v), None),
         }
@@ -233,8 +270,36 @@ class Fetcher:
         return [{"name": i.get("service_item_name") or i.get("name"),
                  "stage": None if i.get("stage") is None else str(i.get("stage")),
                  "fields": i.get("custom_fields") or {},
+                 "files": [{"id": a.get("id"), "name": a.get("name"), "url": a.get("attachment_url")}
+                           for a in i.get("attachments") or []],
                  "attachments": [a.get("name") for a in i.get("attachments") or [] if a.get("name")]}
                 for i in body.get("requested_items", [])]
+
+    def certificate_details(self, files: list[dict]) -> dict | None:
+        """Details printed on the ticket's Certificate of Destruction, or None if unavailable."""
+        for f in files:
+            if not c.is_certificate(f.get("name")):
+                continue
+            key = str(f.get("id") or f["name"])
+            if key in self.cod_cache:
+                return self.cod_cache[key]
+            if self._cod_unavailable or not f.get("url"):
+                continue
+            try:
+                details = cod.parse_cod_text(cod.pdf_text(self.client.download(f["url"])))
+            except cod.CodUnavailable as err:
+                self._cod_unavailable = True
+                self._messages.append(f"Certificate details skipped ({err}).")
+                return None
+            except Exception as err:  # pypdf raises its own error types on damaged files
+                self._record_failure("Certificate", f"{type(err).__name__}: {err}")
+                continue
+            if not details:
+                self._record_failure("Certificate", "layout not recognized")
+                continue
+            self.cod_cache[key] = details
+            return details
+        return None
 
     def _approvals(self, ticket_id: int) -> list[dict]:
         if not self._approvals_allowed:

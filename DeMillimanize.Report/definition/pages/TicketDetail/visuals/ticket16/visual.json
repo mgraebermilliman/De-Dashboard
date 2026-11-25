@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "ticket16",
   "position": {
-    "x": 1140,
-    "y": 680,
+    "x": 1532,
+    "y": 660,
     "z": 16,
-    "height": 376,
+    "height": 396,
     "width": 364,
     "tabOrder": 16
   },
@@ -20,31 +20,64 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FormAnswers"
+                      "Entity": "RunLog"
                     }
                   },
-                  "Property": "Field"
+                  "Property": "Finished (Local)"
                 }
               },
-              "queryRef": "FormAnswers.Field",
-              "nativeQueryRef": "Field"
+              "queryRef": "RunLog.Finished (Local)",
+              "nativeQueryRef": "Finished (Local)",
+              "displayName": "Finished"
             },
             {
               "field": {
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FormAnswers"
+                      "Entity": "RunLog"
                     }
                   },
-                  "Property": "Value"
+                  "Property": "Status"
                 }
               },
-              "queryRef": "FormAnswers.Value",
-              "nativeQueryRef": "Value"
+              "queryRef": "RunLog.Status",
+              "nativeQueryRef": "Status"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "RunLog"
+                    }
+                  },
+                  "Property": "Message"
+                }
+              },
+              "queryRef": "RunLog.Message",
+              "nativeQueryRef": "Message"
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "RunLog"
+                  }
+                },
+                "Property": "Finished (Local)"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": false
       }
     },
     "objects": {
@@ -100,13 +133,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "142D"
+                  "Value": "88D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "FormAnswers.Field"
+            "metadata": "RunLog.Finished (Local)"
           }
         },
         {
@@ -114,13 +147,27 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "177D"
+                  "Value": "71D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "FormAnswers.Value"
+            "metadata": "RunLog.Status"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "160D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "RunLog.Message"
           }
         }
       ]
@@ -139,7 +186,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Form answers (select a ticket above)'"
+                  "Value": "'Refresh log'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
@@ -152,7 +212,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Form answers (select a ticket above)'"
+                  "Value": "'Refresh log'"
                 }
               }
             }

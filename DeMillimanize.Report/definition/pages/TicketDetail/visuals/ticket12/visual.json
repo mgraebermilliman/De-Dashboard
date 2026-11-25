@@ -5,7 +5,7 @@
     "x": 24,
     "y": 244,
     "z": 12,
-    "height": 420,
+    "height": 400,
     "width": 1872,
     "tabOrder": 12
   },
@@ -93,11 +93,25 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Device Type"
+                  "Property": "Recipient Source"
                 }
               },
-              "queryRef": "Requests.Device Type",
-              "nativeQueryRef": "Device Type"
+              "queryRef": "Requests.Recipient Source",
+              "nativeQueryRef": "Recipient Source"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Requests"
+                    }
+                  },
+                  "Property": "Model"
+                }
+              },
+              "queryRef": "Requests.Model",
+              "nativeQueryRef": "Model"
             },
             {
               "field": {
@@ -135,53 +149,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Outcome Source"
-                }
-              },
-              "queryRef": "Requests.Outcome Source",
-              "nativeQueryRef": "Outcome Source"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
                   "Property": "Outcome Evidence"
                 }
               },
               "queryRef": "Requests.Outcome Evidence",
               "nativeQueryRef": "Outcome Evidence"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Approver"
-                }
-              },
-              "queryRef": "Requests.Approver",
-              "nativeQueryRef": "Approver"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Decision Date"
-                }
-              },
-              "queryRef": "Requests.Decision Date",
-              "nativeQueryRef": "Decision Date"
             },
             {
               "field": {
@@ -205,11 +177,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Same Serial Seen Before"
+                  "Property": "Match Confidence"
                 }
               },
-              "queryRef": "Requests.Same Serial Seen Before",
-              "nativeQueryRef": "Same Serial Seen Before"
+              "queryRef": "Requests.Match Confidence",
+              "nativeQueryRef": "Match Confidence"
             },
             {
               "field": {
@@ -219,39 +191,11 @@
                       "Entity": "Requests"
                     }
                   },
-                  "Property": "Match Source"
+                  "Property": "Archived"
                 }
               },
-              "queryRef": "Requests.Match Source",
-              "nativeQueryRef": "Match Source"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Status"
-                }
-              },
-              "queryRef": "Requests.Status",
-              "nativeQueryRef": "Status"
-            },
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "Requests"
-                    }
-                  },
-                  "Property": "Requester Is Technician"
-                }
-              },
-              "queryRef": "Requests.Requester Is Technician",
-              "nativeQueryRef": "Requester Is Technician"
+              "queryRef": "Requests.Archived",
+              "nativeQueryRef": "Archived"
             },
             {
               "field": {
@@ -380,7 +324,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
+                  "Value": "83D"
                 }
               }
             }
@@ -394,7 +338,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "117D"
                 }
               }
             }
@@ -408,7 +352,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "167D"
                 }
               }
             }
@@ -422,7 +366,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "167D"
                 }
               }
             }
@@ -436,7 +380,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "116D"
+                  "Value": "100D"
                 }
               }
             }
@@ -450,13 +394,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
+                  "Value": "134D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Device Type"
+            "metadata": "Requests.Recipient Source"
           }
         },
         {
@@ -464,7 +408,21 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "103D"
+                  "Value": "184D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Requests.Model"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "134D"
                 }
               }
             }
@@ -478,7 +436,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "117D"
                 }
               }
             }
@@ -492,21 +450,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "103D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Outcome Source"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "259D"
+                  "Value": "268D"
                 }
               }
             }
@@ -520,35 +464,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "103D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Approver"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "90D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Decision Date"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "90D"
+                  "Value": "100D"
                 }
               }
             }
@@ -562,13 +478,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "90D"
+                  "Value": "117D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Same Serial Seen Before"
+            "metadata": "Requests.Match Confidence"
           }
         },
         {
@@ -576,13 +492,13 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
+                  "Value": "83D"
                 }
               }
             }
           },
           "selector": {
-            "metadata": "Requests.Match Source"
+            "metadata": "Requests.Archived"
           }
         },
         {
@@ -590,35 +506,7 @@
             "value": {
               "expr": {
                 "Literal": {
-                  "Value": "77D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Status"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "90D"
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "Requests.Requester Is Technician"
-          }
-        },
-        {
-          "properties": {
-            "value": {
-              "expr": {
-                "Literal": {
-                  "Value": "51D"
+                  "Value": "50D"
                 }
               }
             }
@@ -644,6 +532,19 @@
               "expr": {
                 "Literal": {
                   "Value": "'All requests (key columns; every column is in the Excel workbook)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }

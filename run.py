@@ -2,6 +2,7 @@
 
 Usage:
   python run.py extract [--full]   pull tickets and rewrite the workbook (ADM account)
+  python run.py archive [--restart] [--all]  scan archived tickets since 2024 once (about an hour; can be stopped and resumed)
   python run.py probe              show Freshservice response shapes (ADM account)
   python run.py mock               write the fake-data workbook in sample_data/
   python run.py tmdl               regenerate powerbi/DeMillimanize.model.tmdl from the workbook schema
@@ -38,6 +39,9 @@ def main() -> int:
     if command == "extract":
         from extract import run_extract
         return run_extract.main(sys.argv[2:])
+    if command == "archive":
+        from extract import archive
+        return archive.main(sys.argv[2:])
     if command == "mock":
         from sample_data import make_mock_workbook
         return make_mock_workbook.main()
